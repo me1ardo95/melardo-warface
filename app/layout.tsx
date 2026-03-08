@@ -10,7 +10,7 @@ import { Header } from "./components/layout/Header";
 
 const displayPrimary = Bebas_Neue({
   variable: "--font-display-primary",
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
   weight: "400",
 });
 
