@@ -1,0 +1,61 @@
+
+========== ОТЧЁТ E2E ТЕСТИРОВАНИЯ MELARDO WARFACE ==========
+
+Страницы:
+  ✓ / (status: 200)
+  ✓ / (status: 200)
+  ✓ /teams (status: 200)
+  ✓ /matches (status: 200)
+  ✓ /tournaments (status: 200)
+  ✓ /rankings (status: 200)
+  ✓ /support (status: 200)
+  ✓ /rules (status: 200)
+  ✓ /guide (status: 200)
+  ✓ /login (status: 200)
+  ✓ /register (status: 200)
+  ✓ /profile (guest) (status: 200)
+  ✓ /admin (guest) 
+
+Кнопки/ссылки:
+  ✓ Главная: Все вызовы
+  ✓ Главная: Все турниры
+  ✓ Главная: Рейтинги
+  ✓ Команды: Создать команду
+  ✓ Вызовы: Бросить вызов
+  ✗ Вызовы: Случайный соперник
+  ✓ Турниры: Запросить турнир
+  ✓ Админка: разделы — Не залогинен как админ — пропуск
+
+Формы:
+  Заполнено: true, Отправлено: false
+  Заполнено: true, Отправлено: false
+  Заполнено: false, Отправлено: — — Требуется авторизация
+  Заполнено: false, Отправлено: —
+
+Ошибки консоли:
+  Нет
+
+Неудачные сетевые запросы:
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/node_modules_0eaca13a._.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/app_components_HomeGuestLinks_tsx_1c74733d._.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/app_page_tsx_3e1c8e07._.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_components_builtin_global-error_1cf6b850.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/app_layout_tsx_1cf6b850._.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_1dd7fb59.js — net::ERR_ABORTED
+  [http://localhost:3000/] http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_components_builtin_global-error_1cf6b850.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/app_layout_tsx_1cf6b850._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/app_rankings_page_tsx_3e1c8e07._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/_888acd0e._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/node_modules_0eaca13a._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_1e674e59._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/_1abfb2d8._.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_1dd7fb59.js — net::ERR_ABORTED
+  [http://localhost:3000/rankings] http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js — net::ERR_ABORTED
+  [http://localhost:3000/support] http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_components_builtin_global-error_1cf6b850.js — net::ERR_ABORTED
+  [http://localhost:3000/support] http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_1dd7fb59.js — net::ERR_ABORTED
+  [http://localhost:3000/support] http://localhost:3000/_next/static/chunks/app_support_page_tsx_5ac99432._.js — net::ERR_ABORTED
+  [http://localhost:3000/support] http://localhost:3000/_next/static/chunks/app_support_page_tsx_3e1c8e07._.js — net::ERR_ABORTED
+
+Скриншоты: screenshot-home.png
+========== КОНЕЦ ОТЧЁТА ==========

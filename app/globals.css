@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0c0f;
+  --background-soft: #0f141b;
+  --foreground: #ffffff;
+  --muted-foreground: #b0b8c5;
+
+  --card-bg: #1a1e24;
+  --card-border: #2a2f3a;
+
+  --accent-red: #e63946;
+  --accent-red-dark: #b91c1c;
+  --accent-orange: #f97316;
+  --success: #10b981;
+  --danger: #ef4444;
+
+  --ring-color: var(--accent-red);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted-foreground);
+
+  --color-card: var(--card-bg);
+  --color-border-subtle: var(--card-border);
+
+  --color-accent: var(--accent-red);
+  --color-accent-2: var(--accent-orange);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  transition-property: background-color, border-color, color, box-shadow,
+    transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-out;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(145deg, #0a0c0f 0%, #1a1e24 100%);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+.card-surface {
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: radial-gradient(circle at top left, #1f2430 0, #11141a 45%)
+      border-box,
+    radial-gradient(circle at bottom right, #07090c 0, #07090c 55%) border-box;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.card-surface:hover {
+  border-color: var(--accent-red);
+  box-shadow: 0 15px 30px rgba(230, 57, 70, 0.2);
+}
+
+.btn-primary {
+  border-radius: 8px;
+  background-image: linear-gradient(135deg, #e63946, #b91c1c);
+  padding: 12px 24px;
+  font-weight: 600;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(230, 57, 70, 0.35);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 10px 24px rgba(230, 57, 70, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 5px 14px rgba(230, 57, 70, 0.3);
+}
+
+.btn-outline {
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 500;
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: rgba(230, 57, 70, 0.08);
+  box-shadow: 0 6px 16px rgba(230, 57, 70, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-outline:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 10px rgba(230, 57, 70, 0.18);
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #1f2933;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    120deg,
+    rgba(55, 65, 81, 0),
+    rgba(156, 163, 175, 0.4),
+    rgba(55, 65, 81, 0)
+  );
+  animation: skeleton-shimmer 1.3s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
