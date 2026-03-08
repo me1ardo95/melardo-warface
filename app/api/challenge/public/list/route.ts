@@ -36,7 +36,10 @@ export async function GET(request: Request) {
       );
     }
 
-    const challenges = (data ?? []) as (PublicChallenge & {
+    const challenges = (data ?? []).map((item: any) => ({
+      ...item,
+      team: item.team?.[0] || null
+    })) as (PublicChallenge & {
       team?: { id: string; name: string; logo_url: string | null; city?: string | null; mode?: string | null };
     })[];
 
