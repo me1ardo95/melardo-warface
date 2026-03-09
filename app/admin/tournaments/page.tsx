@@ -23,17 +23,26 @@ export default async function AdminTournamentsPage() {
   if (profile.role !== "admin") redirect("/");
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-4 sm:p-6">
       <AdminNav active="tournaments" />
 
       <div className="mx-auto max-w-5xl space-y-4">
-        <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-          Управление турнирами
-        </h1>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Здесь можно просматривать турниры и запускать сетку плей-офф для
-          турниров со статусом &laquo;Регистрация&raquo;.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+              Управление турнирами
+            </h1>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              Здесь можно просматривать турниры, создавать новые и запускать сетку плей-офф.
+            </p>
+          </div>
+          <Link
+            href="/admin/tournaments/create"
+            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+          >
+            Создать турнир
+          </Link>
+        </div>
 
         {tournaments.length === 0 ? (
           <p className="mt-4 text-neutral-500 dark:text-neutral-400">
