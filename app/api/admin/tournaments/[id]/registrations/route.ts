@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+type Team = {
+  id: string;
+  name: string;
+  logo_url?: string | null;
+  mode?: string | null;
+};
+
+type RegistrationRow = {
+  id: string;
+  team_id: string;
+  teams: Team[];
+};
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -44,7 +57,11 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const teams = (data ?? []).map((r: { teams?: { id: string; name: string; logo_url?: string | null; mode?: string | null } }) => r.teams).filter(Boolean);
+    const rows = (data ?? []) as unknown as RegistrationRow[];
+    const teams: Team[] = rows
+      .map((r) => r.teams?.[0])
+      .filter((team): team is Team => Boolean(team));
+
     return NextResponse.json({ teams });
   } catch (err) {
     return NextResponse.json(
