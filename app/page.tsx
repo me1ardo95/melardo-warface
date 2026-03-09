@@ -1,182 +1,243 @@
 import Link from "next/link";
-import { getTopPlayers } from "@/app/actions/data";
-import { HomeGuestLinks } from "./components/HomeGuestLinks";
+import {
+  getTopPlayers,
+  getTournamentsWithDetails,
+  getTeamsRanking,
+} from "@/app/actions/data";
+
+const STATUS_LABELS: Record<string, string> = {
+  upcoming: "Регистрация",
+  ongoing: "Идёт",
+  completed: "Завершён",
+  cancelled: "Отменён",
+};
+
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "short",
+  });
+}
 
 export default async function Home() {
-  const topPlayers = await getTopPlayers(5);
+  const [tournaments, topTeams, topPlayers] = await Promise.all([
+    getTournamentsWithDetails(),
+    getTeamsRanking(5),
+    getTopPlayers(5),
+  ]);
+
+  const activeTournaments = tournaments.filter((t) =>
+    ["upcoming", "ongoing"].includes(t.status)
+  );
+
   return (
-    <div className="min-h-screen p-6">
-      <div className="mx-auto max-w-4xl space-y-10">
-        {/* Приветствие и описание */}
-        <section className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            MELARDO WARFACE — киберспортивная платформа
+    <div className="min-h-screen space-y-12">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#2A2F3A] bg-gradient-to-br from-[#11141A] via-[#0D1014] to-[#07090C] p-8 shadow-2xl sm:p-12 md:p-16">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
+        <div className="relative">
+          <h1 className="text-3xl font-bold tracking-[0.2em] text-white sm:text-4xl md:text-5xl [font-family:var(--font-display-primary)]">
+            MELARDO WARFACE
           </h1>
-          <p className="mt-4 text-neutral-600 dark:text-neutral-400">
-            Соревнования, турниры, рейтинги, лиги. Только честная игра.
+          <p className="mt-2 text-base text-[#F97316] tracking-[0.12em] sm:text-lg [font-family:var(--font-display-alt)]">
+            Киберспортивная платформа Warface
           </p>
-          <div className="mt-6 flex flex-wrap gap-4">
-            <HomeGuestLinks />
-          </div>
-        </section>
-
-        {/* Карточки-заглушки */}
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Последние вызовы
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-neutral-700 dark:text-neutral-300">
-                    Команда A — Команда B
-                  </span>
-                  <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800">
-                    Запланирован
-                  </span>
-                </div>
-                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                  Скоро здесь появятся последние вызовы.
-                </p>
-                <Link
-                  href="/matches"
-                  className="mt-3 inline-block text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  Все вызовы →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Активные турниры
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <h3 className="font-medium text-neutral-900 dark:text-neutral-100">
-                  Турнир Warface #{i}
-                </h3>
-                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                  Скоро здесь появятся активные турниры.
-                </p>
-                <Link
-                  href="/tournaments"
-                  className="mt-3 inline-block text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  Все турниры →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Топ команд
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-200 text-lg font-bold text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
-                    {i}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-neutral-900 dark:text-neutral-100">
-                      Команда #{i}
-                    </h3>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      Скоро здесь появится рейтинг команд.
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  href="/rankings"
-                  className="mt-3 inline-block text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  Рейтинги →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Топ игроков
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {topPlayers.length === 0 ? (
-              <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:col-span-2 lg:col-span-3">
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  Скоро здесь появится рейтинг игроков по личным очкам.
-                </p>
-                <Link
-                  href="/rankings"
-                  className="mt-3 inline-block text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  Все игроки →
-                </Link>
-              </div>
-            ) : (
-              topPlayers.map((player, i) => (
-                <div
-                  key={player.id}
-                  className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"
-                >
-                  <div className="flex items-center gap-3">
-                    {player.avatar_url ? (
-                      <img
-                        src={player.avatar_url}
-                        alt=""
-                        className="h-12 w-12 shrink-0 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-lg font-semibold text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400">
-                        {(player.warface_nick || player.display_name || "?")
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                        {player.warface_nick || player.display_name || "Игрок"}
-                      </p>
-                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Рейтинг: {(player.points ?? 0)} очков
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-sm font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
-                      #{i + 1}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          {topPlayers.length > 0 && (
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#B0B8C5] sm:text-base">
+            Создавай команды, участвуй в турнирах и поднимайся в рейтинге.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/rankings"
-              className="mt-3 inline-block text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+              href="/teams/create"
+              className="inline-flex items-center justify-center rounded-lg bg-[#F97316] px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-[#F97316]/25 transition-all hover:scale-105 hover:bg-[#FDBA74] hover:shadow-xl hover:shadow-[#F97316]/30"
             >
-              Все игроки →
+              Create Team
             </Link>
+            <Link
+              href="/tournaments"
+              className="inline-flex items-center justify-center rounded-lg border border-[#2A2F3A] bg-transparent px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:border-[#F97316] hover:bg-[#F97316]/10 hover:text-[#F97316]"
+            >
+              View Tournaments
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Active Tournaments */}
+      <section>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
+          Active Tournaments
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {activeTournaments.length === 0 ? (
+            <div className="card-surface col-span-full rounded-xl p-6">
+              <p className="text-sm text-[#9CA3AF]">
+                Пока нет активных турниров. Скоро появятся.
+              </p>
+              <Link
+                href="/tournaments"
+                className="mt-3 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+              >
+                Все турниры →
+              </Link>
+            </div>
+          ) : (
+            activeTournaments.slice(0, 6).map((t) => (
+              <Link
+                key={t.id}
+                href={`/tournaments/${t.id}`}
+                className="card-surface group block rounded-xl p-5 transition-all hover:border-[#F97316]/50 hover:shadow-lg hover:shadow-[#F97316]/10"
+              >
+                <h3 className="font-semibold text-white group-hover:text-[#F97316]">
+                  {t.name}
+                </h3>
+                <p className="mt-1 text-xs text-[#9CA3AF]">
+                  {formatDate(t.start_date)} · {t.registered_teams}
+                  {typeof (t as { max_teams?: number }).max_teams === "number"
+                    ? ` / ${(t as { max_teams: number }).max_teams}`
+                    : ""}{" "}
+                  команд
+                </p>
+                <span className="mt-2 inline-block rounded-full bg-[#1F2937] px-2 py-0.5 text-[11px] font-medium text-[#F97316]">
+                  {STATUS_LABELS[t.status] ?? t.status}
+                </span>
+              </Link>
+            ))
           )}
-        </section>
-      </div>
+        </div>
+        {activeTournaments.length > 0 && (
+          <Link
+            href="/tournaments"
+            className="mt-4 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+          >
+            Все турниры →
+          </Link>
+        )}
+      </section>
+
+      {/* Top Teams */}
+      <section>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
+          Top Teams
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {topTeams.length === 0 ? (
+            <div className="card-surface col-span-full rounded-xl p-6">
+              <p className="text-sm text-[#9CA3AF]">
+                Пока нет команд в рейтинге.
+              </p>
+              <Link
+                href="/rankings"
+                className="mt-3 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+              >
+                Рейтинги →
+              </Link>
+            </div>
+          ) : (
+            topTeams.map((team, i) => (
+              <Link
+                key={team.id}
+                href={`/teams/${team.id}`}
+                className="card-surface group flex items-center gap-3 rounded-xl p-4 transition-all hover:border-[#F97316]/50 hover:shadow-lg hover:shadow-[#F97316]/10"
+              >
+                {team.logo_url ? (
+                  <img
+                    src={team.logo_url}
+                    alt=""
+                    className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-[#2A2F3A] group-hover:ring-[#F97316]/50"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1F2937] text-lg font-bold text-[#F97316] group-hover:bg-[#2A2F3A]">
+                    {i + 1}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-white group-hover:text-[#F97316]">
+                    {team.name}
+                  </h3>
+                  <p className="text-xs text-[#9CA3AF]">
+                    {team.points} очков · {team.wins} побед
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#1F2937] px-2.5 py-0.5 text-xs font-bold text-[#F97316]">
+                  #{i + 1}
+                </span>
+              </Link>
+            ))
+          )}
+        </div>
+        {topTeams.length > 0 && (
+          <Link
+            href="/rankings"
+            className="mt-4 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+          >
+            Рейтинги →
+          </Link>
+        )}
+      </section>
+
+      {/* Top Players */}
+      <section>
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
+          Top Players
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {topPlayers.length === 0 ? (
+            <div className="card-surface col-span-full rounded-xl p-6">
+              <p className="text-sm text-[#9CA3AF]">
+                Скоро здесь появится рейтинг игроков.
+              </p>
+              <Link
+                href="/rankings"
+                className="mt-3 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+              >
+                Все игроки →
+              </Link>
+            </div>
+          ) : (
+            topPlayers.map((player, i) => (
+              <Link
+                key={player.id}
+                href={`/players/${player.id}`}
+                className="card-surface group flex items-center gap-3 rounded-xl p-4 transition-all hover:border-[#F97316]/50 hover:shadow-lg hover:shadow-[#F97316]/10"
+              >
+                {player.avatar_url ? (
+                  <img
+                    src={player.avatar_url}
+                    alt=""
+                    className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-[#2A2F3A] group-hover:ring-[#F97316]/50"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1F2937] text-lg font-semibold text-[#F97316] group-hover:bg-[#2A2F3A]">
+                    {(player.warface_nick || player.display_name || "?")
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-white group-hover:text-[#F97316]">
+                    {player.warface_nick || player.display_name || "Игрок"}
+                  </p>
+                  <p className="text-xs text-[#9CA3AF]">
+                    {(player.points ?? 0)} очков
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full bg-amber-500/20 px-2.5 py-0.5 text-xs font-bold text-amber-400">
+                  #{i + 1}
+                </span>
+              </Link>
+            ))
+          )}
+        </div>
+        {topPlayers.length > 0 && (
+          <Link
+            href="/rankings"
+            className="mt-4 inline-block text-sm font-medium text-[#F97316] transition-colors hover:text-[#FDBA74]"
+          >
+            Все игроки →
+          </Link>
+        )}
+      </section>
     </div>
   );
 }

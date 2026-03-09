@@ -1,11 +1,12 @@
-import Link from 'next/link'
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   getCurrentProfile,
   getTournamentsWithDetails,
 } from "@/app/actions/data";
-import { GenerateBracketButton } from "./GenerateBracketButton";
 import { AdminNav } from "../AdminNav";
+import { GenerateBracketButton } from "./GenerateBracketButton";
+import { DeleteTournamentButton } from "./DeleteTournamentButton";
 
 const STATUS_LABELS: Record<string, string> = {
   upcoming: "Регистрация",
@@ -26,14 +27,14 @@ export default async function AdminTournamentsPage() {
     <div className="min-h-screen p-4 sm:p-6">
       <AdminNav active="tournaments" />
 
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className="mx-auto max-w-6xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
               Управление турнирами
             </h1>
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Здесь можно просматривать турниры, создавать новые и запускать сетку плей-офф.
+              Создание, редактирование, генерация сетки и просмотр команд.
             </p>
           </div>
           <Link
@@ -49,55 +50,99 @@ export default async function AdminTournamentsPage() {
             Турниров пока нет.
           </p>
         ) : (
-          <ul className="mt-4 space-y-3">
-            {tournaments.map((t) => {
-              const statusLabel = STATUS_LABELS[t.status] ?? t.status;
-              const canGenerate =
-                t.status === "upcoming" && !(t as any).bracket_data;
+          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+            <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+              <thead>
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    Mode
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    Teams
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
+                {tournaments.map((t) => {
+                  const statusLabel = STATUS_LABELS[t.status] ?? t.status;
+                  const modeLabel = (t.game ?? "—") as string;
+                  const canGenerate =
+                    t.status === "upcoming" && !(t as { bracket_data?: unknown }).bracket_data;
+                  const maxTeams = (t as { max_teams?: number }).max_teams;
 
-              return (
-                <li
-                  key={t.id}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
-                >
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        href={`/tournaments/${t.id}`}
-                        className="text-sm font-semibold text-neutral-900 hover:underline dark:text-neutral-100"
-                      >
-                        {t.name}
-                      </Link>
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
-                        {statusLabel}
-                      </span>
-                    </div>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Формат: {t.format ?? t.game ?? "—"} · Команд:{" "}
-                      {t.registered_teams}
-                      {typeof (t as any).max_teams === "number"
-                        ? ` / ${(t as any).max_teams}`
-                        : ""}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 text-xs">
-                    <Link
-                      href={`/tournaments/${t.id}/bracket`}
-                      className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                  return (
+                    <tr
+                      key={t.id}
+                      className="text-sm text-neutral-900 dark:text-neutral-100"
                     >
-                      Сетка
-                    </Link>
-                    {canGenerate && (
-                      <GenerateBracketButton tournamentId={t.id} />
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        <Link
+                          href={`/tournaments/${t.id}`}
+                          className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+                        >
+                          {t.name}
+                        </Link>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-neutral-600 dark:text-neutral-400">
+                        {modeLabel}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        <span className="font-mono">
+                          {t.registered_teams}
+                          {typeof maxTeams === "number" ? ` / ${maxTeams}` : ""}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        <span className="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+                          {statusLabel}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/tournaments/${t.id}/teams`}
+                            className="rounded-md border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                          >
+                            Teams
+                          </Link>
+                          <Link
+                            href={`/tournaments/${t.id}/bracket`}
+                            className="rounded-md border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                          >
+                            Bracket
+                          </Link>
+                          {canGenerate && (
+                            <GenerateBracketButton tournamentId={t.id} />
+                          )}
+                          <Link
+                            href={`/admin/tournaments/${t.id}/edit`}
+                            className="rounded-md border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                          >
+                            Edit
+                          </Link>
+                          <DeleteTournamentButton
+                            tournamentId={t.id}
+                            tournamentName={t.name}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
   );
 }
-

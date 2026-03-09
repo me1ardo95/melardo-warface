@@ -12,9 +12,16 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { tournament_id, team_id } = body as { tournament_id?: string; team_id?: string };
+    const { tournament_id, team_id } = body as {
+      tournament_id?: string;
+      team_id?: string;
+    };
 
-    if (!tournament_id || typeof tournament_id !== "string" || !tournament_id.trim()) {
+    if (
+      !tournament_id ||
+      typeof tournament_id !== "string" ||
+      !tournament_id.trim()
+    ) {
       return NextResponse.json(
         { error: "tournament_id is required" },
         { status: 400 }
@@ -24,6 +31,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "team_id is required" },
         { status: 400 }
+      );
+    }
+
+    // Ensure current user is captain of this team.
+    const { data: member } = await supabase
+      .from("team_members")
+      .select("role")
+      .eq("team_id", team_id.trim())
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!member || member.role !== "captain") {
+      return NextResponse.json(
+        { error: "Only team captains can register for tournaments" },
+        { status: 403 }
       );
     }
 
@@ -49,8 +71,12 @@ export async function POST(request: Request) {
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Internal server error" },
+      {
+        error:
+          err instanceof Error ? err.message : "Internal server error",
+      },
       { status: 500 }
     );
   }
 }
+

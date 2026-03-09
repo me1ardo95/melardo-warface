@@ -2,6 +2,47 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendNotification } from "@/lib/notifications";
 
+type BracketMatch = {
+  match_id: string | null;
+};
+
+type BracketRound = {
+  matches: BracketMatch[];
+};
+
+type BracketData = {
+  rounds: BracketRound[];
+};
+
+const TEAM_POINTS_PER_MATCH_WIN = 10;
+const PLAYER_POINTS_PER_MATCH_WIN = 5;
+const TEAM_POINTS_PER_TOURNAMENT_WIN = 25;
+const PLAYER_POINTS_PER_TOURNAMENT_WIN = 10;
+
+async function isFinalTournamentMatch(
+  supabase: ReturnType<typeof createClient> extends Promise<infer C> ? C : never,
+  tournamentId: string | null,
+  matchId: string
+): Promise<boolean> {
+  if (!tournamentId) return false;
+
+  const { data } = await supabase
+    .from("tournaments")
+    .select("bracket_data")
+    .eq("id", tournamentId)
+    .single();
+
+  const bracket = (data?.bracket_data ?? null) as BracketData | null;
+  if (!bracket || !Array.isArray(bracket.rounds) || bracket.rounds.length === 0) {
+    return false;
+  }
+
+  const lastRound = bracket.rounds[bracket.rounds.length - 1];
+  if (!lastRound || !Array.isArray(lastRound.matches)) return false;
+
+  return lastRound.matches.some((m) => m.match_id === matchId);
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -55,7 +96,7 @@ export async function POST(request: Request) {
 
     const { data: match } = await supabase
       .from("matches")
-      .select("id, team1_id, team2_id, status")
+      .select("id, team1_id, team2_id, status, tournament_id")
       .eq("id", matchId)
       .single();
 
@@ -162,40 +203,57 @@ export async function POST(request: Request) {
           })
           .eq("id", matchId);
 
-        // Award points: +3 to winning team and its members
-        const winnerId =
-          c1.score_team1 > c1.score_team2 ? match.team1_id : match.team2_id;
-        const POINTS_PER_WIN = 3;
+        // Award ranking points only once per match completion.
+        if (match.status !== "completed") {
+          const winnerId =
+            c1.score_team1 > c1.score_team2 ? match.team1_id : match.team2_id;
 
-        if (winnerId) {
-          const { data: teamRow } = await supabase
-            .from("teams")
-            .select("points")
-            .eq("id", winnerId)
-            .single();
-          await supabase
-            .from("teams")
-            .update({
-              points: (teamRow?.points ?? 0) + POINTS_PER_WIN,
-            })
-            .eq("id", winnerId);
+          if (winnerId) {
+            const isFinal = await isFinalTournamentMatch(
+              supabase,
+              (match as any).tournament_id ?? null,
+              matchId
+            );
 
-          const { data: members } = await supabase
-            .from("team_members")
-            .select("user_id")
-            .eq("team_id", winnerId);
-          for (const m of members ?? []) {
-            const { data: prof } = await supabase
-              .from("profiles")
+            const teamDelta =
+              TEAM_POINTS_PER_MATCH_WIN +
+              (isFinal ? TEAM_POINTS_PER_TOURNAMENT_WIN : 0);
+            const playerDelta =
+              PLAYER_POINTS_PER_MATCH_WIN +
+              (isFinal ? PLAYER_POINTS_PER_TOURNAMENT_WIN : 0);
+
+            const { data: teamRow } = await supabase
+              .from("teams")
               .select("points")
-              .eq("id", m.user_id)
+              .eq("id", winnerId)
               .single();
+
             await supabase
-              .from("profiles")
+              .from("teams")
               .update({
-                points: (prof?.points ?? 0) + POINTS_PER_WIN,
+                points: (teamRow?.points ?? 0) + teamDelta,
               })
-              .eq("id", m.user_id);
+              .eq("id", winnerId);
+
+            const { data: members } = await supabase
+              .from("team_members")
+              .select("user_id")
+              .eq("team_id", winnerId);
+
+            for (const m of members ?? []) {
+              const { data: prof } = await supabase
+                .from("profiles")
+                .select("points")
+                .eq("id", m.user_id)
+                .single();
+
+              await supabase
+                .from("profiles")
+                .update({
+                  points: (prof?.points ?? 0) + playerDelta,
+                })
+                .eq("id", m.user_id);
+            }
           }
         }
 

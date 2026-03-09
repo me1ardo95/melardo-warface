@@ -1,6 +1,47 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+const TEAM_POINTS_PER_MATCH_WIN = 10;
+const PLAYER_POINTS_PER_MATCH_WIN = 5;
+const TEAM_POINTS_PER_TOURNAMENT_WIN = 25;
+const PLAYER_POINTS_PER_TOURNAMENT_WIN = 10;
+
+type BracketMatch = {
+  match_id: string | null;
+};
+
+type BracketRound = {
+  matches: BracketMatch[];
+};
+
+type BracketData = {
+  rounds: BracketRound[];
+};
+
+async function isFinalTournamentMatch(
+  supabase: ReturnType<typeof createClient> extends Promise<infer C> ? C : never,
+  tournamentId: string | null,
+  matchId: string
+): Promise<boolean> {
+  if (!tournamentId) return false;
+
+  const { data } = await supabase
+    .from("tournaments")
+    .select("bracket_data")
+    .eq("id", tournamentId)
+    .single();
+
+  const bracket = (data?.bracket_data ?? null) as BracketData | null;
+  if (!bracket || !Array.isArray(bracket.rounds) || bracket.rounds.length === 0) {
+    return false;
+  }
+
+  const lastRound = bracket.rounds[bracket.rounds.length - 1];
+  if (!lastRound || !Array.isArray(lastRound.matches)) return false;
+
+  return lastRound.matches.some((m) => m.match_id === matchId);
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -52,7 +93,7 @@ export async function POST(request: Request) {
 
     const { data: match } = await supabase
       .from("matches")
-      .select("id, team1_id, team2_id, status")
+      .select("id, team1_id, team2_id, status, tournament_id")
       .eq("id", match_id)
       .single();
 
@@ -79,9 +120,21 @@ export async function POST(request: Request) {
       .eq("id", match_id);
 
     const winnerId = s1 > s2 ? match.team1_id : match.team2_id;
-    const POINTS_PER_WIN = 3;
 
     if (winnerId) {
+      const isFinal = await isFinalTournamentMatch(
+        supabase,
+        (match as any).tournament_id ?? null,
+        match_id
+      );
+
+      const teamDelta =
+        TEAM_POINTS_PER_MATCH_WIN +
+        (isFinal ? TEAM_POINTS_PER_TOURNAMENT_WIN : 0);
+      const playerDelta =
+        PLAYER_POINTS_PER_MATCH_WIN +
+        (isFinal ? PLAYER_POINTS_PER_TOURNAMENT_WIN : 0);
+
       const { data: teamRow } = await supabase
         .from("teams")
         .select("points")
@@ -90,7 +143,7 @@ export async function POST(request: Request) {
       await supabase
         .from("teams")
         .update({
-          points: (teamRow?.points ?? 0) + POINTS_PER_WIN,
+          points: (teamRow?.points ?? 0) + teamDelta,
         })
         .eq("id", winnerId);
 
@@ -107,7 +160,7 @@ export async function POST(request: Request) {
         await supabase
           .from("profiles")
           .update({
-            points: (prof?.points ?? 0) + POINTS_PER_WIN,
+            points: (prof?.points ?? 0) + playerDelta,
           })
           .eq("id", m.user_id);
       }
