@@ -1,37 +1,7 @@
-import { notFound } from "next/navigation";
-import { getTournament, getTeamsWhereUserIsCaptain } from "@/app/actions/data";
-import { TournamentRegisterForm } from "./TournamentRegisterForm";
-
-type Props = { params: Promise<{ id: string }> };
-
-export default async function TournamentRegisterPage({ params }: Props) {
-  const { id } = await params;
-
-  const [tournament, teams] = await Promise.all([
-    getTournament(id),
-    getTeamsWhereUserIsCaptain(),
-  ]);
-
-  if (!tournament) notFound();
-
-  return (
-    <div className="min-h-screen px-4 py-6 sm:px-6">
-      <div className="mx-auto flex max-w-xl flex-col gap-4">
-        <TournamentRegisterForm
-          tournamentId={tournament.id}
-          tournamentName={tournament.name}
-          teams={teams}
-        />
-      </div>
-    </div>
-  );
-}
-
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { BackButton } from "@/app/components/BackButton";
-import { getTournament, getCurrentProfile } from "@/app/actions/data";
-import { getTeamsWhereUserIsCaptain } from "@/app/actions/data";
+import { getTournament, getCurrentProfile, getTeamsWhereUserIsCaptain } from "@/app/actions/data";
 import TournamentRegisterForm from "./TournamentRegisterForm";
 
 type Props = { params: Promise<{ id: string }> };

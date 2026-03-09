@@ -8,6 +8,20 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
+type TournamentTeam = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  mode: string | null;
+};
+
+type TournamentRegistrationRow = {
+  id: string;
+  team_id: string;
+  created_at: string;
+  teams: TournamentTeam | null;
+};
+
 export default async function AdminTournamentTeamsPage({ params }: Props) {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login");
@@ -39,7 +53,11 @@ export default async function AdminTournamentTeamsPage({ params }: Props) {
     .eq("tournament_id", id)
     .order("created_at", { ascending: true });
 
-  const teams = (regs ?? []).map((r: { teams?: { id: string; name: string; logo_url?: string | null; mode?: string | null } }) => r.teams).filter(Boolean);
+  const registrationRows = (regs ?? []) as unknown as TournamentRegistrationRow[];
+
+  const teams: TournamentTeam[] = registrationRows
+    .map((r) => r.teams)
+    .filter((team): team is TournamentTeam => Boolean(team));
 
   return (
     <div className="min-h-screen p-4 sm:p-6">
@@ -86,7 +104,7 @@ export default async function AdminTournamentTeamsPage({ params }: Props) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
-                {teams.map((team: { id: string; name: string; mode?: string | null }, i: number) => (
+                {teams.map((team: TournamentTeam, i: number) => (
                   <tr key={team.id} className="text-sm">
                     <td className="whitespace-nowrap px-4 py-3 font-mono text-neutral-500">
                       {i + 1}
