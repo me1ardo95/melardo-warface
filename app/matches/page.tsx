@@ -134,13 +134,13 @@ export default async function MatchesPage() {
                         />
                       ) : (
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1F2937] text-xs font-semibold text-[#E5E7EB]">
-                          {c.team?.name?.charAt(0).toUpperCase() ?? "?"}
+                          {c.team?.name?.charAt(0).toUpperCase() ?? "—"}
                         </div>
                       )}
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-medium text-white">
-                            {c.team?.name ?? "Команда"}
+                            {c.team ? c.team.name : "Команда удалена"}
                           </span>
                           <span className="rounded-full bg-[#1F2937] px-2 py-0.5 text-[11px] font-mono text-[#F97316]">
                             {c.mode}

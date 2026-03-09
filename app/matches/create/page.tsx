@@ -28,8 +28,6 @@ export default function CreateMatchPage() {
     const payload = {
       teamId: String(formData.get("myTeam") || "").trim(),
       mode: String(formData.get("mode") || "5x5"),
-      date: String(formData.get("date") || ""),
-      time: String(formData.get("time") || ""),
       comment: String(formData.get("comment") || "").trim() || undefined,
     };
 
@@ -111,36 +109,6 @@ export default function CreateMatchPage() {
               <option value="5x5">5x5</option>
               <option value="8x8">8x8</option>
             </select>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="date"
-                className="mb-1 block text-sm font-medium text-[#E5E7EB]"
-              >
-                Дата
-              </label>
-              <input
-                id="date"
-                name="date"
-                type="date"
-                className="w-full rounded-md border border-[#2A2F3A] bg-[#11141A] px-3 py-2 text-sm text-white focus:border-[#E63946] focus:outline-none focus:ring-1 focus:ring-[#E63946]"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="time"
-                className="mb-1 block text-sm font-medium text-[#E5E7EB]"
-              >
-                Время
-              </label>
-              <input
-                id="time"
-                name="time"
-                type="time"
-                className="w-full rounded-md border border-[#2A2F3A] bg-[#11141A] px-3 py-2 text-sm text-white focus:border-[#E63946] focus:outline-none focus:ring-1 focus:ring-[#E63946]"
-              />
-            </div>
           </div>
           <div>
             <label

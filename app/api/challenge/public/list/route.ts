@@ -36,11 +36,21 @@ export async function GET(request: Request) {
       );
     }
 
-    const challenges = (data ?? []).map((item: any) => ({
-      ...item,
-      team: item.team?.[0] || null
-    })) as (PublicChallenge & {
-      team?: { id: string; name: string; logo_url: string | null; city?: string | null; mode?: string | null };
+    const challenges = (data ?? []).map((item: any) => {
+      const team = Array.isArray(item.team) ? item.team[0] : item.team;
+      return {
+        id: item.id,
+        team_id: item.team_id,
+        mode: item.mode,
+        scheduled_at: item.scheduled_at,
+        comment: item.comment,
+        status: item.status,
+        match_id: item.match_id,
+        created_at: item.created_at,
+        team: team ?? null,
+      };
+    }) as (PublicChallenge & {
+      team?: { id: string; name: string; logo_url: string | null; city?: string | null; mode?: string | null } | null;
     })[];
 
     if (randomFlag && challenges.length > 0) {

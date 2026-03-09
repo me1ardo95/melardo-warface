@@ -20,8 +20,6 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as {
       teamId?: string;
       mode?: string;
-      date?: string;
-      time?: string;
       comment?: string;
     };
 
@@ -56,16 +54,7 @@ export async function POST(request: Request) {
       );
     }
 
-    let scheduled_at: string | null = null;
-    if (body.date) {
-      const time = body.time && typeof body.time === "string"
-        ? body.time
-        : "21:00";
-      const iso = new Date(`${body.date}T${time}:00.000Z`);
-      if (!Number.isNaN(iso.getTime())) {
-        scheduled_at = iso.toISOString();
-      }
-    }
+    const scheduled_at = new Date().toISOString();
 
     const payload: PublicChallengeCreate = {
       team_id: teamId,
