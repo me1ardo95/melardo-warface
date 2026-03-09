@@ -21,8 +21,8 @@ export default async function TeamsPage({ searchParams }: Props) {
   const teamsForTable = [...teamsRaw].sort((a, b) => b.points - a.points);
 
   return (
-    <div className="min-h-screen p-6">
-      <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
+    <div className="min-h-screen p-4 sm:p-6">
+      <nav className="mb-6 flex flex-wrap items-center gap-3 border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
         <Link href="/" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
           Главная
         </Link>
@@ -65,8 +65,8 @@ export default async function TeamsPage({ searchParams }: Props) {
           </p>
         ) : view === "table" ? (
           /* Таблица лиги */
-          <div className="mt-4 overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
-            <table className="w-full text-sm">
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-[720px] text-sm rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
               <thead>
                 <tr className="border-b border-neutral-200 bg-neutral-50 text-left dark:border-neutral-700 dark:bg-neutral-800/50">
                   <th className="px-4 py-3 font-medium text-neutral-600 dark:text-neutral-400">Место</th>

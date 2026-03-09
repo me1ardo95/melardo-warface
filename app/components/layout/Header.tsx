@@ -10,6 +10,7 @@ export function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -39,6 +40,8 @@ export function Header() {
     loadUserAndRole();
   }, []);
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
   if (loading) {
     return (
       <header className="border-b border-[#2A2F3A] bg-[#07090C]/80 backdrop-blur">
@@ -56,15 +59,16 @@ export function Header() {
   return (
     <header className="border-b border-[#2A2F3A] bg-[#07090C]/80 backdrop-blur">
       <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex items-center gap-4">
           <Link
             href="/"
             className="font-bold tracking-[0.18em] text-sm text-white hover:text-[#F97316] [font-family:var(--font-display-primary)]"
+            onClick={closeMobileMenu}
           >
             MELARDO WARFACE
           </Link>
-          {user ? (
-            <>
+          {user && (
+            <div className="hidden items-center gap-4 md:flex">
               <Link
                 href="/"
                 className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
@@ -127,40 +131,29 @@ export function Header() {
                   Админка
                 </Link>
               )}
-            </>
-          ) : (
-            <>
-              <Link
-                href="/rules"
-                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
-              >
-                Правила
-              </Link>
-              <Link
-                href="/guide"
-                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
-              >
-                Руководство
-              </Link>
-              <Link
-                href="/support"
-                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
-              >
-                Поддержка
-              </Link>
-            </>
+            </div>
           )}
         </div>
         <div className="ml-auto flex items-center gap-3">
           {user ? (
-            <form action={signOut}>
+            <>
               <button
-                type="submit"
-                className="btn-outline text-xs uppercase tracking-wide"
+                type="button"
+                className="inline-flex items-center justify-center rounded-md border border-[#374151] px-3 py-2 text-sm font-medium text-[#E5E7EB] hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-[#F97316] md:hidden"
+                aria-label="Открыть меню"
+                onClick={() => setIsMobileMenuOpen((v) => !v)}
               >
-                Выйти
+                ☰
               </button>
-            </form>
+              <form action={signOut} className="hidden md:block">
+                <button
+                  type="submit"
+                  className="btn-outline text-xs uppercase tracking-wide"
+                >
+                  Выйти
+                </button>
+              </form>
+            </>
           ) : (
             <>
               <Link
@@ -185,6 +178,94 @@ export function Header() {
           )}
         </div>
       </nav>
+
+      {user && isMobileMenuOpen && (
+        <div className="border-t border-[#2A2F3A] bg-[#020617] px-4 py-3 md:hidden">
+          <nav className="mx-auto flex max-w-5xl flex-col gap-1 text-sm">
+            <Link
+              href="/"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Главная
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Профиль
+            </Link>
+            <Link
+              href="/teams"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Команды
+            </Link>
+            <Link
+              href="/matches"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Вызовы
+            </Link>
+            <Link
+              href="/tournaments"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Турниры
+            </Link>
+            <Link
+              href="/rankings"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Рейтинги
+            </Link>
+            <Link
+              href="/rules"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Правила
+            </Link>
+            <Link
+              href="/guide"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Руководство
+            </Link>
+            <Link
+              href="/support"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#F97316] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Поддержать проект
+            </Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#FBBF24] hover:bg-[#111827]"
+                onClick={closeMobileMenu}
+              >
+                Админка
+              </Link>
+            )}
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="mt-1 w-full rounded-md px-3 py-2 text-left text-xs uppercase tracking-wide text-[#F97316] hover:bg-[#111827]"
+                onClick={closeMobileMenu}
+              >
+                Выйти
+              </button>
+            </form>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

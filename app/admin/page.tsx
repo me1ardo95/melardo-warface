@@ -15,8 +15,8 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <div className="min-h-screen p-6">
-      <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
+    <div className="min-h-screen p-4 sm:p-6">
+      <nav className="mb-6 flex flex-wrap items-center gap-3 border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
         <Link
           href="/"
           className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"

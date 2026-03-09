@@ -79,7 +79,7 @@ export default async function ProfilePage() {
   const isFreeAgent = !profile.points || profile.points <= 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-0">
       <div className="card-surface flex flex-col gap-6 p-6 sm:p-8">
         <div className="flex flex-wrap items-start gap-6">
           <div className="relative">
@@ -111,30 +111,30 @@ export default async function ProfilePage() {
               </span>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Link href="/profile/edit" className="btn-primary text-xs">
+              <Link href="/profile/edit" className="btn-primary text-xs w-full sm:w-auto text-center">
                 Редактировать профиль
               </Link>
               {myTeamId ? (
                 <Link
                   href={`/teams/${myTeamId}`}
-                  className="btn-outline text-xs"
+                  className="btn-outline text-xs w-full sm:w-auto text-center"
                 >
                   Моя команда
                 </Link>
               ) : (
-                <span className="rounded border border-[#374151] bg-[#1F2937] px-3 py-1.5 text-xs font-medium text-[#6B7280] cursor-default">
+                <span className="w-full rounded border border-[#374151] bg-[#1F2937] px-3 py-1.5 text-center text-xs font-medium text-[#6B7280] cursor-default sm:w-auto">
                   Не в команде
                 </span>
               )}
               <Link
                 href="/support"
-                className="btn-outline text-xs"
+                className="btn-outline text-xs w-full sm:w-auto text-center"
               >
                 Поддержать проект
               </Link>
               <ComplaintButton
                 playerId={profile.id}
-                className="rounded border border-[#2A2F3A] bg-[#11141A] px-2 py-1 text-xs font-medium text-[#B0B8C5] hover:bg-[#1F2937] hover:text-white"
+                className="w-full rounded border border-[#2A2F3A] bg-[#11141A] px-2 py-1 text-xs font-medium text-[#B0B8C5] hover:bg-[#1F2937] hover:text-white sm:w-auto"
               />
               <span className="text-xs uppercase tracking-wide text-[#B0B8C5]">
                 Статус:{" "}

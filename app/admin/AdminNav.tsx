@@ -31,23 +31,25 @@ const navItems: { key: AdminNavSection; href: string; label: string }[] = [
 
 export function AdminNav({ active }: { active?: AdminNavSection }) {
   return (
-    <nav className="mb-6 flex flex-wrap gap-2 border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
-      {navItems.map((item) => {
-        const isActive = item.key === active;
-        return (
-          <Link
-            key={item.key}
-            href={item.href}
-            className={
-              isActive
-                ? "inline-flex items-center gap-1 rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-neutral-100 shadow-sm dark:bg-neutral-100 dark:text-neutral-900"
-                : "inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
-            }
-          >
-            <span>{item.label}</span>
-          </Link>
-        );
-      })}
+    <nav className="mb-6 overflow-x-auto border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
+      <div className="flex w-max gap-2 whitespace-nowrap">
+        {navItems.map((item) => {
+          const isActive = item.key === active;
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              className={
+                isActive
+                  ? "inline-flex items-center gap-1 rounded-md bg-neutral-900 px-3 py-1.5 font-medium text-neutral-100 shadow-sm dark:bg-neutral-100 dark:text-neutral-900"
+                  : "inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+              }
+            >
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
