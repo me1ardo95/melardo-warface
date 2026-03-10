@@ -106,6 +106,12 @@ export async function POST(request: Request) {
       role: "member",
     });
     if (insertError) {
+      if (insertError.code === "23505") {
+        return NextResponse.json(
+          { error: "Игрок уже состоит в другой команде" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { error: insertError.message },
         { status: 400 }

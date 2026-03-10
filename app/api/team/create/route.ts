@@ -12,17 +12,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Необходима авторизация" }, { status: 401 });
     }
 
-    const { data: existingCaptain } = await supabase
+    const { data: existingMember } = await supabase
       .from("team_members")
-      .select("team_id")
+      .select("team_id, role")
       .eq("user_id", user.id)
-      .eq("role", "captain")
-      .limit(1)
       .maybeSingle();
 
-    if (existingCaptain) {
+    if (existingMember) {
       return NextResponse.json(
-        { error: "Вы уже являетесь капитаном команды" },
+        { error: "Вы уже состоите в команде. Покиньте её, чтобы создать новую." },
         { status: 400 }
       );
     }
@@ -85,6 +83,12 @@ export async function POST(request: Request) {
     });
 
     if (memberError) {
+      if (memberError.code === "23505") {
+        return NextResponse.json(
+          { error: "Вы уже состоите в команде. Покиньте её, чтобы создать новую." },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { error: memberError.message },
         { status: 400 }

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { apiError, apiSuccess } from "@/lib/api-response";
 import type { Tournament } from "@/lib/types";
 
 type BracketTeam = { id: string; name: string };
@@ -38,25 +38,13 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "Необходима авторизация" },
-        { status: 401 }
-      );
-    }
+    if (!user) return apiError("Необходима авторизация", 401);
 
     const body = await request.json().catch(() => ({}));
     const tournamentId =
-      typeof body?.tournamentId === "string" && body.tournamentId.trim()
-        ? body.tournamentId.trim()
-        : "";
+      typeof body?.tournamentId === "string" ? body.tournamentId.trim() : "";
 
-    if (!tournamentId) {
-      return NextResponse.json(
-        { error: "Не указан турнир" },
-        { status: 400 }
-      );
-    }
+    if (!tournamentId) return apiError("Не указан турнир", 400);
 
     const { data: tournamentRow, error: tournamentError } = await supabase
       .from("tournaments")
@@ -65,10 +53,7 @@ export async function POST(request: Request) {
       .single();
 
     if (tournamentError || !tournamentRow) {
-      return NextResponse.json(
-        { error: "Турнир не найден" },
-        { status: 404 }
-      );
+      return apiError("Турнир не найден", 404);
     }
 
     const tournament = tournamentRow as Tournament & {
@@ -77,17 +62,14 @@ export async function POST(request: Request) {
     };
 
     if (tournament.status !== "upcoming") {
-      return NextResponse.json(
-        { error: "Сетку можно генерировать только для турниров в статусе 'Регистрация'" },
-        { status: 400 }
+      return apiError(
+        "Сетку можно генерировать только для турниров в статусе «Регистрация»",
+        400
       );
     }
 
     if (tournament.bracket_data) {
-      return NextResponse.json(
-        { error: "Сетка уже сгенерирована для этого турнира" },
-        { status: 400 }
-      );
+      return apiError("Сетка уже сгенерирована для этого турнира", 400);
     }
 
     const { data: registrations, error: regsError } = await supabase
@@ -95,12 +77,7 @@ export async function POST(request: Request) {
       .select("team_id, teams(id, name)")
       .eq("tournament_id", tournamentId);
 
-    if (regsError) {
-      return NextResponse.json(
-        { error: regsError.message },
-        { status: 400 }
-      );
-    }
+    if (regsError) return apiError(regsError.message, 400);
 
     type RegRow = {
       team_id?: string;
@@ -118,28 +95,20 @@ export async function POST(request: Request) {
     const teamCount = teams.length;
 
     if (teamCount < 2) {
-      return NextResponse.json(
-        { error: "Для сетки нужно минимум две команды" },
-        { status: 400 }
-      );
+      return apiError("Для генерации сетки нужно минимум две команды", 400);
     }
 
     if (tournament.max_teams && teamCount !== tournament.max_teams) {
-      return NextResponse.json(
-        {
-          error: `Количество команд (${teamCount}) должно совпадать с ограничением турнира (${tournament.max_teams})`,
-        },
-        { status: 400 }
+      return apiError(
+        `Количество команд (${teamCount}) должно совпадать с лимитом турнира (${tournament.max_teams})`,
+        400
       );
     }
 
     if (!isPowerOfTwo(teamCount)) {
-      return NextResponse.json(
-        {
-          error:
-            "Для формата Single Elimination поддерживаются только 4, 8, 16, 32 и т.д. команд (степень двойки).",
-        },
-        { status: 400 }
+      return apiError(
+        "Для формата Single Elimination нужно 2, 4, 8, 16 или 32 команды (степень двойки). Зарегистрируйте нужное количество команд.",
+        400
       );
     }
 
@@ -174,13 +143,9 @@ export async function POST(request: Request) {
       .select("id");
 
     if (insertError || !createdMatches) {
-      return NextResponse.json(
-        {
-          error:
-            insertError?.message ??
-            "Не удалось создать матчи первого раунда",
-        },
-        { status: 400 }
+      return apiError(
+        insertError?.message ?? "Не удалось создать матчи первого раунда",
+        400
       );
     }
 
@@ -207,12 +172,9 @@ export async function POST(request: Request) {
         .select("id");
 
       if (playOffError || !playOffMatches) {
-        return NextResponse.json(
-          {
-            error:
-              playOffError?.message ?? "Не удалось создать матчи плей-офф",
-          },
-          { status: 400 }
+        return apiError(
+          playOffError?.message ?? "Не удалось создать матчи плей-офф",
+          400
         );
       }
 
@@ -261,6 +223,26 @@ export async function POST(request: Request) {
       rounds,
     };
 
+    // Связываем матчи между раундами через next_match_id в таблице matches.
+    // Для каждого матча в раунде r указываем матч в раунде r+1, в который
+    // переходит победитель (две соседние сетки в раунде ведут в одну игру
+    // следующего раунда).
+    for (let roundIndex = 0; roundIndex < totalRounds - 1; roundIndex++) {
+      const currentRoundIds = allMatchIdsByRound[roundIndex] ?? [];
+      const nextRoundIds = allMatchIdsByRound[roundIndex + 1] ?? [];
+
+      for (let i = 0; i < currentRoundIds.length; i++) {
+        const fromMatchId = currentRoundIds[i];
+        const toMatchId = nextRoundIds[Math.floor(i / 2)];
+        if (!fromMatchId || !toMatchId) continue;
+
+        await supabase
+          .from("matches")
+          .update({ next_match_id: toMatchId })
+          .eq("id", fromMatchId);
+      }
+    }
+
     const { error: updateError } = await supabase
       .from("tournaments")
       .update({
@@ -269,22 +251,13 @@ export async function POST(request: Request) {
       })
       .eq("id", tournamentId);
 
-    if (updateError) {
-      return NextResponse.json(
-        { error: updateError.message },
-        { status: 400 }
-      );
-    }
+    if (updateError) return apiError(updateError.message, 400);
 
-    return NextResponse.json(bracketData);
+    return apiSuccess(bracketData);
   } catch (err) {
-    return NextResponse.json(
-      {
-        error:
-          err instanceof Error ? err.message : "Внутренняя ошибка сервера",
-      },
-      { status: 500 }
-    );
+    const msg =
+      err instanceof Error ? err.message : "Внутренняя ошибка сервера";
+    return apiError(msg, 500);
   }
 }
 

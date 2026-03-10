@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { apiError, apiSuccess } from "@/lib/api-response";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
@@ -7,11 +8,10 @@ export async function POST(request: Request) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: "Необходима авторизация" },
-        { status: 401 }
-      );
+    if (!user) return apiError("Необходима авторизация", 401);
+
+    if (!checkRateLimit(`complaint:${user.id}`)) {
+      return apiError("Слишком много запросов. Попробуйте через минуту.", 429);
     }
 
     const body = await request.json().catch(() => ({}));
@@ -39,12 +39,7 @@ export async function POST(request: Request) {
       (typeof subject === "string" && subject.trim()) ||
       (typeof reason === "string" && reason.trim()) ||
       "";
-    if (!reasonText) {
-      return NextResponse.json(
-        { error: "Укажите причину жалобы" },
-        { status: 400 }
-      );
-    }
+    if (!reasonText) return apiError("Укажите причину жалобы", 400);
 
     const { data, error } = await supabase
       .from("complaints")
@@ -75,22 +70,13 @@ export async function POST(request: Request) {
       .select("id, subject, status, created_at")
       .single();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+    if (error) return apiError(error.message, 400);
+    if (!data) return apiError("Не удалось создать жалобу", 500);
 
-    if (!data) {
-      return NextResponse.json(
-        { error: "Не удалось создать жалобу" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(data);
+    return apiSuccess(data);
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Internal server error" },
-      { status: 500 }
-    );
+    const msg =
+      err instanceof Error ? err.message : "Внутренняя ошибка сервера";
+    return apiError(msg, 500);
   }
 }

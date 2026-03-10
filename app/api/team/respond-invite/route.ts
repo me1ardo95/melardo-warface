@@ -74,6 +74,12 @@ export async function POST(request: Request) {
       });
 
       if (memberError) {
+        if (memberError.code === "23505") {
+          return NextResponse.json(
+            { success: false, error: "Вы уже состоите в другой команде. Покиньте её, чтобы вступить в новую." },
+            { status: 400 }
+          );
+        }
         return NextResponse.json(
           { error: memberError.message },
           { status: 400 }

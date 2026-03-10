@@ -6,6 +6,7 @@ type AdminNavSection =
   | "referrals"
   | "points"
   | "tournaments"
+  | "matches"
   | "disputed-matches"
   | "complaints"
   | "players"
@@ -18,6 +19,7 @@ const navItems: { key: AdminNavSection; href: string; label: string }[] = [
   { key: "referrals", href: "/admin/referrals", label: "🔗 Рефералы" },
   { key: "points", href: "/admin/points", label: "📈 Начисление очков" },
   { key: "tournaments", href: "/admin/tournaments", label: "🏆 Турниры" },
+  { key: "matches", href: "/admin/matches", label: "🎮 Матчи" },
   {
     key: "disputed-matches",
     href: "/admin/disputed-matches",
