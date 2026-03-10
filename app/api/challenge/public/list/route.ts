@@ -36,7 +36,18 @@ export async function GET(request: Request) {
       );
     }
 
-    const challenges = (data ?? []).map((item: any) => {
+    type Row = {
+      id: string;
+      team_id: string;
+      mode: string;
+      scheduled_at: string | null;
+      comment: string | null;
+      status: string;
+      match_id: string | null;
+      created_at: string;
+      team?: { id: string; name: string; logo_url: string | null; city?: string | null; mode?: string | null } | { id: string; name: string; logo_url: string | null; city?: string | null; mode?: string | null }[] | null;
+    };
+    const challenges = (data ?? []).map((item: Row) => {
       const team = Array.isArray(item.team) ? item.team[0] : item.team;
       return {
         id: item.id,

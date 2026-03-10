@@ -6,6 +6,7 @@
    Copy `.env.local.example` to `.env.local` and set:
    - `NEXT_PUBLIC_SUPABASE_URL` — Project URL (Settings → API)
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — anon/public key (Settings → API)
+   - `NEXT_PUBLIC_SITE_URL` — Public site URL for referral links (e.g. `https://melardo-warface.ru`)
 
 3. **Database schema**  
    In the Supabase Dashboard → **SQL Editor**, run the contents of  

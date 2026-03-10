@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signUp } from "@/app/actions/auth";
 import {
@@ -12,6 +12,8 @@ import {
 } from "@/lib/validation";
 
 export default function RegisterPage() {
+  const [acceptedRules, setAcceptedRules] = useState(false);
+  const [rulesError, setRulesError] = useState<string | null>(null);
   const [state, formAction] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       const result = await signUp(formData);
@@ -24,7 +26,18 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
         <h1 className="text-xl font-semibold">Регистрация</h1>
-        <form action={formAction} className="space-y-4">
+        <form
+          action={formAction}
+          className="space-y-4"
+          onSubmit={(e) => {
+            if (!acceptedRules) {
+              e.preventDefault();
+              setRulesError("Вы должны принять правила платформы.");
+            } else {
+              setRulesError(null);
+            }
+          }}
+        >
           {state?.error && (
             <p className="text-sm text-red-600 dark:text-red-400">
               {state.error}
@@ -35,7 +48,7 @@ export default function RegisterPage() {
               htmlFor="email"
               className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
             >
-              Email
+              Эл. почта
             </label>
             <input
               id="email"
@@ -44,7 +57,7 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-              placeholder="you@example.com"
+              placeholder="ваш@email.com"
               suppressHydrationWarning
             />
           </div>
@@ -90,6 +103,33 @@ export default function RegisterPage() {
               placeholder="Не менее 6 символов"
               suppressHydrationWarning
             />
+          </div>
+          <div>
+            <label className="flex cursor-pointer items-start gap-2">
+              <input
+                type="checkbox"
+                checked={acceptedRules}
+                onChange={(e) => {
+                  setAcceptedRules(e.target.checked);
+                  if (rulesError) setRulesError(null);
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800"
+              />
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                Я принимаю{" "}
+                <Link
+                  href="/rules"
+                  className="text-blue-600 underline hover:text-blue-500 dark:text-blue-400"
+                >
+                  правила платформы
+                </Link>
+              </span>
+            </label>
+            {rulesError && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {rulesError}
+              </p>
+            )}
           </div>
           <button
             type="submit"

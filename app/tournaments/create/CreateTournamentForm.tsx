@@ -65,10 +65,10 @@ export default function CreateTournamentForm() {
           className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
         >
           <option value="">— Выберите —</option>
-          <option value="Single Elimination">Single Elimination</option>
-          <option value="Double Elimination">Double Elimination</option>
-          <option value="Round Robin">Round Robin</option>
-          <option value="Swiss">Swiss</option>
+          <option value="Single Elimination">Олимпийская система</option>
+          <option value="Double Elimination">Двойное выбывание</option>
+          <option value="Round Robin">Круговая система</option>
+          <option value="Swiss">Швейцарская</option>
         </select>
       </div>
       <div>

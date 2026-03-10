@@ -329,7 +329,7 @@ export default async function ProfilePage() {
         <div className="mt-3 flex flex-col gap-2 text-sm">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded bg-[#111827] px-3 py-2 font-mono text-xs text-[#E5E7EB]">
-              {`https://melardo-warface.ru/ref/${encodeURIComponent(
+              {`${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/ref/${encodeURIComponent(
                 profile.warface_nick ?? profile.display_name ?? profile.email ?? profile.id
               )}`}
             </span>

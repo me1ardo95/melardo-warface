@@ -15,8 +15,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { warface_nick, avatar_url } = body as {
+    const body = await request.json().catch(() => ({}));
+    const { warface_nick, avatar_url } = (body ?? {}) as {
       warface_nick?: string;
       avatar_url?: string;
     };

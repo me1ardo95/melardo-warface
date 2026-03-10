@@ -122,7 +122,7 @@ export default function SupportPage() {
           <span className="text-2xl">📧</span>
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-[#E5E7EB] [font-family:var(--font-display-primary)]">
-              Email
+              Эл. почта
             </div>
             <div className="text-sm text-[#B0B8C5]">melardo.warface@mail.ru</div>
           </div>
@@ -181,7 +181,7 @@ export default function SupportPage() {
               <a href="https://t.me/melardo_warface" target="_blank" rel="noreferrer" className="text-[#F97316] hover:underline">
                 Telegram-канал
               </a>{" "}
-              или на email.
+              или на эл. почту.
             </p>
           </div>
           <div className="rounded-xl border border-[#2A2F3A] bg-[#0f141b] p-4">
@@ -232,7 +232,7 @@ export default function SupportPage() {
 
             <div>
               <label htmlFor="support-email" className="mb-1 block text-xs font-medium text-[#E5E7EB]">
-                Email <span className="text-[#ef4444]">*</span>
+                Эл. почта <span className="text-[#ef4444]">*</span>
               </label>
               <input
                 id="support-email"
@@ -240,7 +240,7 @@ export default function SupportPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-[#2A2F3A] bg-[#0f141b] px-3 py-2 text-sm text-white placeholder-[#6b7280] focus:border-[#F97316] focus:outline-none focus:ring-1 focus:ring-[#F97316]"
-                placeholder="email@example.com"
+                placeholder="ваш@email.com"
                 suppressHydrationWarning
               />
               {errors.email && <p className="mt-1 text-xs text-[#ef4444]">{errors.email}</p>}

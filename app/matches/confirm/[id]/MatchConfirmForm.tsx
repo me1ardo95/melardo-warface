@@ -22,7 +22,8 @@ export default function MatchConfirmForm({
     setLoading(true);
     setMessage(null);
     setError(null);
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     formData.set("match_id", matchId);
 
     try {
@@ -46,7 +47,7 @@ export default function MatchConfirmForm({
           "Подтверждение отправлено. Ожидается подтверждение второй команды."
         );
       }
-      e.currentTarget.reset();
+      form?.reset();
     } catch {
       setError("Ошибка сети. Попробуйте позже.");
     } finally {

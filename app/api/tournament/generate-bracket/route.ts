@@ -102,14 +102,18 @@ export async function POST(request: Request) {
       );
     }
 
+    type RegRow = {
+      team_id?: string;
+      teams?: { id: string; name: string } | { id: string; name: string }[] | null;
+    };
     const teams: BracketTeam[] =
-      registrations
-        ?.map((r: any) =>
-          r.teams
-            ? { id: r.teams.id as string, name: r.teams.name as string }
-            : null
-        )
-        .filter((t: BracketTeam | null): t is BracketTeam => !!t) ?? [];
+      (registrations ?? [])
+        .map((r: RegRow) => {
+          const t = r.teams;
+          const team = Array.isArray(t) ? t[0] : t;
+          return team ? { id: team.id, name: team.name } : null;
+        })
+        .filter((t): t is BracketTeam => !!t);
 
     const teamCount = teams.length;
 
@@ -180,7 +184,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const firstRoundIds = createdMatches.map((m: any) => m.id as string);
+    const firstRoundIds = (createdMatches ?? []).map((m: { id: string }) => m.id);
 
     // Create play-off matches for rounds 2+ (semifinals, finals, etc.)
     const allMatchIdsByRound: (string | null)[][] = [firstRoundIds];
@@ -213,7 +217,7 @@ export async function POST(request: Request) {
       }
 
       allMatchIdsByRound.push(
-        playOffMatches.map((m: any) => m.id as string)
+        (playOffMatches ?? []).map((m: { id: string }) => m.id)
       );
     }
 
@@ -261,7 +265,7 @@ export async function POST(request: Request) {
       .from("tournaments")
       .update({
         status: "ongoing",
-        bracket_data: bracketData as any,
+        bracket_data: bracketData as unknown as Record<string, unknown>,
       })
       .eq("id", tournamentId);
 

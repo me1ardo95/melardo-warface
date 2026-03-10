@@ -67,7 +67,7 @@ export default function AdminTournamentCreatePage() {
 
       if (!res.ok) {
         setError(
-          (data as any)?.error ??
+          (data as { error?: string })?.error ??
             "Не удалось создать турнир. Попробуйте ещё раз."
         );
         setSubmitting(false);
@@ -160,7 +160,7 @@ export default function AdminTournamentCreatePage() {
                     defaultChecked
                     className="h-4 w-4 border-neutral-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span>Single Elimination</span>
+                  <span>Олимпийская система</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -169,7 +169,7 @@ export default function AdminTournamentCreatePage() {
                     value="round_robin"
                     className="h-4 w-4 border-neutral-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span>Round Robin</span>
+                  <span>Круговая система</span>
                 </label>
               </div>
             </fieldset>

@@ -21,10 +21,13 @@ async function adjustPlayerPoints(formData: FormData) {
 
   if (!profile) return;
 
-  await supabase
+  const newPoints = (profile.points ?? 0) + delta;
+  const { error: updateError } = await supabase
     .from("profiles")
-    .update({ points: (profile.points ?? 0) + delta })
+    .update({ points: newPoints })
     .eq("id", profile.id);
+
+  if (updateError) return;
 
   await supabase.from("profile_points_history").insert({
     profile_id: profile.id,
@@ -51,10 +54,13 @@ async function adjustTeamPoints(formData: FormData) {
 
   if (!team) return;
 
-  await supabase
+  const newPoints = (team.points ?? 0) + delta;
+  const { error: updateError } = await supabase
     .from("teams")
-    .update({ points: (team.points ?? 0) + delta })
+    .update({ points: newPoints })
     .eq("id", team.id);
+
+  if (updateError) return;
 
   await supabase.from("team_points_history").insert({
     team_id: team.id,

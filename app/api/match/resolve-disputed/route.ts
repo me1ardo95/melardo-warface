@@ -124,7 +124,7 @@ export async function POST(request: Request) {
     if (winnerId) {
       const isFinal = await isFinalTournamentMatch(
         supabase,
-        (match as any).tournament_id ?? null,
+        match?.tournament_id ?? null,
         match_id
       );
 

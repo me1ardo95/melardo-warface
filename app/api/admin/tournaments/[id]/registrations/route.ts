@@ -11,7 +11,7 @@ type Team = {
 type RegistrationRow = {
   id: string;
   team_id: string;
-  teams: Team[];
+  teams: Team | Team[] | null;
 };
 
 export async function GET(
@@ -59,7 +59,7 @@ export async function GET(
 
     const rows = (data ?? []) as unknown as RegistrationRow[];
     const teams: Team[] = rows
-      .map((r) => r.teams?.[0])
+      .map((r) => (Array.isArray(r.teams) ? r.teams[0] : r.teams))
       .filter((team): team is Team => Boolean(team));
 
     return NextResponse.json({ teams });

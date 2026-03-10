@@ -198,11 +198,11 @@ export default function AdminTournamentEditPage() {
               <div className="space-y-2 text-sm">
                 <label className="flex items-center gap-2">
                   <input type="radio" name="format" value="single_elimination" defaultChecked={tournament.format === "single_elimination"} className="h-4 w-4" />
-                  <span>Single Elimination</span>
+                  <span>Олимпийская система</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input type="radio" name="format" value="round_robin" defaultChecked={tournament.format === "round_robin"} className="h-4 w-4" />
-                  <span>Round Robin</span>
+                  <span>Круговая система</span>
                 </label>
               </div>
             </fieldset>

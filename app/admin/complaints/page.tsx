@@ -53,17 +53,24 @@ async function getPendingComplaints(): Promise<ComplaintRow[]> {
       : { data: [] },
   ]);
 
+  type ProfileRow = { id: string; warface_nick: string | null; display_name: string | null };
+  type MatchRow = {
+    id: string;
+    team1: { name: string } | { name: string }[] | null;
+    team2: { name: string } | { name: string }[] | null;
+  };
   const profileMap = new Map(
-    (profilesRes.data ?? []).map((p: any) => [
+    (profilesRes.data ?? []).map((p: ProfileRow) => [
       p.id,
       { warface_nick: p.warface_nick, display_name: p.display_name },
     ])
   );
   const matchMap = new Map(
-    (matchesRes.data ?? []).map((m: any) => [
-      m.id,
-      { team1: m.team1, team2: m.team2 },
-    ])
+    (matchesRes.data ?? []).map((m: MatchRow) => {
+      const t1 = Array.isArray(m.team1) ? m.team1[0] : m.team1;
+      const t2 = Array.isArray(m.team2) ? m.team2[0] : m.team2;
+      return [m.id, { team1: t1 ?? null, team2: t2 ?? null }];
+    })
   );
 
   return rows.map((r) => ({

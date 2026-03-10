@@ -6,12 +6,12 @@ import Link from "next/link";
 const mockMatches = [
   {
     id: "match-1",
-    title: "Cyber Wolves vs Shadow Dragons",
+    title: "Киберволки vs Теневые драконы",
     date: "12.03.2026",
   },
   {
     id: "match-2",
-    title: "Night Raiders vs Pixel Titans",
+    title: "Ночные рейдеры vs Пиксельные титаны",
     date: "10.03.2026",
   },
 ];

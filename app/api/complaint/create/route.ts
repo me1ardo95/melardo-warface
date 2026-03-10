@@ -79,6 +79,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    if (!data) {
+      return NextResponse.json(
+        { error: "Не удалось создать жалобу" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json(

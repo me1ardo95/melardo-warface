@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function TournamentRequestForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export default function TournamentRequestForm() {
         throw new Error(data?.error || "Не удалось отправить заявку");
       }
       setSuccess("Заявка отправлена. Мы уведомим вас о решении.");
-      (event.currentTarget as HTMLFormElement).reset();
+      formRef.current?.reset();
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Произошла ошибка при отправке заявки"
@@ -94,7 +95,7 @@ export default function TournamentRequestForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+    <form ref={formRef} onSubmit={handleSubmit} className="mt-6 space-y-4">
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       {success && (
         <p className="text-sm text-emerald-600 dark:text-emerald-400">
@@ -159,7 +160,7 @@ export default function TournamentRequestForm() {
               defaultChecked
               className="h-4 w-4 border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800"
             />
-            <span>Single Elimination</span>
+            <span>Олимпийская система</span>
           </label>
           <label className="inline-flex items-center gap-2">
             <input
@@ -168,7 +169,7 @@ export default function TournamentRequestForm() {
               value="Round Robin"
               className="h-4 w-4 border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800"
             />
-            <span>Round Robin</span>
+            <span>Круговая система</span>
           </label>
         </div>
       </fieldset>

@@ -51,13 +51,13 @@ export default async function Home() {
               href="/teams/create"
               className="inline-flex items-center justify-center rounded-lg bg-[#F97316] px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-[#F97316]/25 transition-all hover:scale-105 hover:bg-[#FDBA74] hover:shadow-xl hover:shadow-[#F97316]/30"
             >
-              Create Team
+              Создать команду
             </Link>
             <Link
               href="/tournaments"
               className="inline-flex items-center justify-center rounded-lg border border-[#2A2F3A] bg-transparent px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:border-[#F97316] hover:bg-[#F97316]/10 hover:text-[#F97316]"
             >
-              View Tournaments
+              Смотреть турниры
             </Link>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default async function Home() {
       {/* Active Tournaments */}
       <section>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
-          Active Tournaments
+          Активные турниры
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {activeTournaments.length === 0 ? (
@@ -118,7 +118,7 @@ export default async function Home() {
       {/* Top Teams */}
       <section>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
-          Top Teams
+          Лучшие команды
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {topTeams.length === 0 ? (
@@ -179,7 +179,7 @@ export default async function Home() {
       {/* Top Players */}
       <section>
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
-          Top Players
+          Лучшие игроки
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {topPlayers.length === 0 ? (

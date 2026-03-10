@@ -63,18 +63,20 @@ async function handleRequest(
     });
   }
 
-  try {
-    if (existing) {
-      await supabase.from("user_notifications").insert({
-        user_id: existing.user_id,
-        type: "tournament_request_status",
-        message:
-          action === "approve"
-            ? `Ваша заявка на турнир "${existing.title}" одобрена.`
-            : `Ваша заявка на турнир "${existing.title}" отклонена.`,
-      });
-    }
-  } catch {
+  if (existing) {
+    const { sendNotification } = await import("@/lib/notifications");
+    const title = "Заявка на турнир";
+    const message =
+      action === "approve"
+        ? `Ваша заявка на турнир "${existing.title}" одобрена.`
+        : `Ваша заявка на турнир "${existing.title}" отклонена.`;
+    await sendNotification(
+      existing.user_id,
+      "tournament",
+      title,
+      message,
+      "/tournaments"
+    );
   }
 }
 
@@ -162,8 +164,8 @@ export default async function AdminTournamentRequestsPage() {
                     <p className="text-sm text-neutral-500 dark:text-neutral-400">
                       Режим: {req.mode} · Формат:{" "}
                       {req.format === "round_robin"
-                        ? "Round Robin"
-                        : "Single Elimination"}{" "}
+                        ? "Круговая система"
+                        : "Олимпийская система"}{" "}
                       · Команд:{" "}
                       {req.min_teams === req.max_teams
                         ? req.min_teams

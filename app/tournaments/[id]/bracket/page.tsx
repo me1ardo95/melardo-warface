@@ -36,9 +36,9 @@ export default async function TournamentBracketPage({ params }: Props) {
 
   if (!tournament) notFound();
 
-  const bracket = (tournament as any).bracket_data as BracketData | null;
+  const bracket = (tournament.bracket_data ?? null) as BracketData | null;
 
-  if (!bracket || bracket.rounds.length === 0) {
+  if (!bracket || !Array.isArray(bracket.rounds) || bracket.rounds.length === 0) {
     return (
       <div className="min-h-screen p-6">
         <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
@@ -113,7 +113,7 @@ export default async function TournamentBracketPage({ params }: Props) {
           Сетка плей-офф — {tournament.name}
         </h1>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Формат: Single Elimination. Победитель матча проходит в следующий
+          Формат: Олимпийская система. Победитель матча проходит в следующий
           раунд.
         </p>
 

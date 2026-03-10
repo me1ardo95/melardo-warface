@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            'Формат должен быть "Single Elimination" или "Round Robin"',
+            'Формат должен быть "single_elimination" или "round_robin"',
         },
         { status: 400 }
       );
@@ -122,6 +122,13 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "Не удалось сохранить заявку" },
+        { status: 500 }
       );
     }
 

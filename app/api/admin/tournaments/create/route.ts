@@ -112,7 +112,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase
       .from("tournaments")
-      .insert(insertPayload as any)
+      .insert(insertPayload)
       .select("id")
       .single();
 
