@@ -154,6 +154,21 @@ export default async function AdminMatchesPage() {
                         {formatDate(m.scheduled_at ?? null)}
                       </div>
 
+                      {(m.screenshot_url || (confirmations.length > 0 && confirmations.some((c) => c.screenshot_url))) && (
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          {m.screenshot_url && (
+                            <a
+                              href={m.screenshot_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+                            >
+                              Скриншот
+                            </a>
+                          )}
+                        </div>
+                      )}
+
                       {confirmations.length > 0 && (
                         <div className="mt-2 space-y-1">
                           <span className="text-xs font-medium text-neutral-600 dark:text-neutral-300">

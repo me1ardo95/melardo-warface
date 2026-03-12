@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-type Props = { currentTab: string };
+type Props = { currentTab: string; basePath?: string };
 
-export default function RankingsTabs({ currentTab }: Props) {
+export default function RankingsTabs({ currentTab, basePath = "/rankings" }: Props) {
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
 
-  const base = `/rankings?page=1`;
-  const teamsLink = currentTab === "teams" ? null : `/rankings?tab=teams&page=1`;
-  const playersLink = currentTab === "players" ? null : `/rankings?tab=players&page=1`;
+  const teamsLink = currentTab === "teams" ? null : `${basePath}?tab=teams&page=${page}`;
+  const playersLink = currentTab === "players" ? null : `${basePath}?tab=players&page=${page}`;
 
   return (
     <div className="mt-4 flex gap-1 border-b border-neutral-200 dark:border-neutral-800">

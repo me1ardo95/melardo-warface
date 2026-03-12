@@ -4,27 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getTournament, getCurrentProfile } from "@/app/actions/data";
 import type { Match } from "@/lib/types";
 
-type BracketTeam = { id: string; name: string };
-
-type BracketMatch = {
-  id: string;
-  match_id: string | null;
-  round: number;
-  position: number;
-  team1: BracketTeam | null;
-  team2: BracketTeam | null;
-};
-
-type BracketRound = {
-  round: number;
-  matches: BracketMatch[];
-};
-
-type BracketData = {
-  type: "single_elimination";
-  rounds: BracketRound[];
-};
-
 type Props = { params: Promise<{ id: string }> };
 
 export default async function TournamentBracketPage({ params }: Props) {
@@ -36,9 +15,31 @@ export default async function TournamentBracketPage({ params }: Props) {
 
   if (!tournament) notFound();
 
-  const bracket = (tournament.bracket_data ?? null) as BracketData | null;
+  const supabase = await createClient();
+  const { data: bracketRows } = await supabase
+    .from("tournament_brackets")
+    .select(
+      `
+      id,
+      round,
+      match_number,
+      match_id,
+      team1:teams!tournament_brackets_team1_id_fkey(id, name),
+      team2:teams!tournament_brackets_team2_id_fkey(id, name)
+    `
+    )
+    .eq("tournament_id", id);
 
-  if (!bracket || !Array.isArray(bracket.rounds) || bracket.rounds.length === 0) {
+  const rows = (bracketRows ?? []) as unknown as Array<{
+    id: string;
+    round: string;
+    match_number: number;
+    match_id: string | null;
+    team1: { id: string; name: string } | null;
+    team2: { id: string; name: string } | null;
+  }>;
+
+  if (rows.length === 0) {
     return (
       <div className="min-h-screen p-6">
         <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
@@ -64,15 +65,7 @@ export default async function TournamentBracketPage({ params }: Props) {
     );
   }
 
-  const supabase = await createClient();
-  const matchIds = Array.from(
-    new Set(
-      bracket.rounds
-        .flatMap((r) => r.matches)
-        .map((m) => m.match_id)
-        .filter((id): id is string => !!id)
-    )
-  );
+  const matchIds = Array.from(new Set(rows.map((r) => r.match_id).filter((v): v is string => !!v)));
 
   let matchesById = new Map<string, Match>();
 
@@ -87,6 +80,33 @@ export default async function TournamentBracketPage({ params }: Props) {
   }
 
   const isAdmin = profile?.role === "admin";
+
+  const roundOrder = (round: string) => {
+    if (round === "final") return 10_000;
+    if (round === "semi_final") return 9_000;
+    const n = Number(round);
+    return Number.isFinite(n) ? n : 5_000;
+  };
+  const roundLabel = (round: string) => {
+    if (round === "final") return "Финал";
+    if (round === "semi_final") return "Полуфинал";
+    return `Раунд ${round}`;
+  };
+
+  const rounds = Array.from(
+    rows.reduce((acc, r) => {
+      const key = r.round;
+      const list = acc.get(key) ?? [];
+      list.push(r);
+      acc.set(key, list);
+      return acc;
+    }, new Map<string, typeof rows>())
+  )
+    .map(([round, matches]) => ({
+      round,
+      matches: [...matches].sort((a, b) => (a.match_number ?? 0) - (b.match_number ?? 0)),
+    }))
+    .sort((a, b) => roundOrder(a.round) - roundOrder(b.round));
 
   return (
     <div className="min-h-screen p-6">
@@ -126,13 +146,13 @@ export default async function TournamentBracketPage({ params }: Props) {
 
         <div className="mt-4 overflow-x-auto">
           <div className="flex gap-6">
-            {bracket.rounds.map((round) => (
+            {rounds.map((round) => (
               <div
                 key={round.round}
                 className="min-w-[220px] rounded-xl border border-neutral-800 bg-[#11141A] p-4"
               >
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-300">
-                  Раунд {round.round}
+                  {roundLabel(round.round)}
                 </h2>
                 <ul className="mt-3 space-y-3 text-sm">
                   {round.matches.map((match) => {
@@ -156,7 +176,7 @@ export default async function TournamentBracketPage({ params }: Props) {
                               {match.team1?.name ?? "—"}
                             </span>
                             <span className="text-xs text-neutral-400">
-                              {round.round === 1 ? "1/8" : ""}
+                              {match.match_number ? `#${match.match_number}` : ""}
                             </span>
                           </div>
                           <div className="flex items-center justify-between gap-2">

@@ -88,6 +88,12 @@ export function Header() {
                 Команды
               </Link>
               <Link
+                href="/clans"
+                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
+              >
+                Кланы
+              </Link>
+              <Link
                 href="/matches"
                 className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
               >
@@ -104,6 +110,36 @@ export function Header() {
                 className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
               >
                 Рейтинги
+              </Link>
+              <Link
+                href="/leaderboard"
+                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
+              >
+                Таблица лидеров
+              </Link>
+              <Link
+                href="/missions"
+                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
+              >
+                Миссии
+              </Link>
+              <Link
+                href="/season"
+                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
+              >
+                Сезон
+              </Link>
+              <Link
+                href="/stats"
+                className="text-xs uppercase tracking-wide text-[#B0B8C5] hover:text-white"
+              >
+                Статистика
+              </Link>
+              <Link
+                href="/quick-match"
+                className="text-xs uppercase tracking-wide text-[#F97316] hover:text-white"
+              >
+                Быстрый матч
               </Link>
               <Link
                 href="/rules"
@@ -204,6 +240,13 @@ export function Header() {
               Команды
             </Link>
             <Link
+              href="/clans"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Кланы
+            </Link>
+            <Link
               href="/matches"
               className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
               onClick={closeMobileMenu}
@@ -223,6 +266,41 @@ export function Header() {
               onClick={closeMobileMenu}
             >
               Рейтинги
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Таблица лидеров
+            </Link>
+            <Link
+              href="/missions"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Миссии
+            </Link>
+            <Link
+              href="/season"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Сезон
+            </Link>
+            <Link
+              href="/stats"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#E5E7EB] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Статистика
+            </Link>
+            <Link
+              href="/quick-match"
+              className="rounded-md px-3 py-2 text-xs uppercase tracking-wide text-[#F97316] hover:bg-[#111827]"
+              onClick={closeMobileMenu}
+            >
+              Быстрый матч
             </Link>
             <Link
               href="/rules"

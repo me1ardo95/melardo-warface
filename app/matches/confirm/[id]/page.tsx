@@ -90,6 +90,7 @@ export default async function MatchConfirmPage({ params }: Props) {
             matchId={match.id}
             team1Name={match.team1?.name ?? "Команда 1"}
             team2Name={match.team2?.name ?? "Команда 2"}
+            requireSecretPhrase={!!(match as { secret_phrase?: string | null }).secret_phrase}
           />
         </div>
       </div>

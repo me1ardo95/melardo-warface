@@ -13,13 +13,15 @@ import {
 
 type FormData = {
   warface_nick: string;
+  rank: number;
 };
 
 type Props = {
   warfaceNick: string | null;
+  rank: number | null;
 };
 
-export default function ProfileEditForm({ warfaceNick }: Props) {
+export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Props) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -31,6 +33,7 @@ export default function ProfileEditForm({ warfaceNick }: Props) {
   } = useForm<FormData>({
     defaultValues: {
       warface_nick: warfaceNick ?? "",
+      rank: initialRank ?? 1,
     },
   });
 
@@ -44,6 +47,7 @@ export default function ProfileEditForm({ warfaceNick }: Props) {
         body: JSON.stringify({
           warface_nick: data.warface_nick.trim(),
           avatar_url: avatarUrl || undefined,
+          rank: data.rank,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -95,6 +99,35 @@ export default function ProfileEditForm({ warfaceNick }: Props) {
         {errors.warface_nick && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
             {errors.warface_nick.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label
+          htmlFor="rank"
+          className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+        >
+          Ранг в Warface
+        </label>
+        <input
+          id="rank"
+          type="number"
+          min={1}
+          max={100}
+          className={inputClass}
+          {...register("rank", {
+            valueAsNumber: true,
+            min: { value: 1, message: "Ранг от 1 до 100" },
+            max: { value: 100, message: "Ранг от 1 до 100" },
+          })}
+        />
+        <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+          Минимум 26 — для матчей, 55 — для турниров
+        </p>
+        {errors.rank && (
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+            {errors.rank.message}
           </p>
         )}
       </div>

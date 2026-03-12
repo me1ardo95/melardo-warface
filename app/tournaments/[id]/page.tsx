@@ -5,8 +5,12 @@ import { getTournament, getTournamentsWithDetails } from "@/app/actions/data";
 
 const STATUS_LABELS: Record<string, string> = {
   upcoming: "Регистрация",
+  registration: "Регистрация",
+  starting: "Стартует",
   ongoing: "Идёт",
+  active: "Идёт",
   completed: "Завершён",
+  finished: "Завершён",
   cancelled: "Отменён",
 };
 
@@ -78,7 +82,7 @@ export default async function TournamentPage({ params }: Props) {
             </div>
           </dl>
           <div className="mt-6 flex flex-wrap gap-3">
-            {tournament.status === "upcoming" && (
+            {(tournament.status === "upcoming" || tournament.status === "registration") && (
               <Link
                 href={`/tournaments/${tournament.id}/register`}
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -86,7 +90,9 @@ export default async function TournamentPage({ params }: Props) {
                 Зарегистрировать команду
               </Link>
             )}
-            {(tournament.status === "ongoing" || tournament.status === "completed") && (
+            {(["ongoing", "active", "completed", "finished"] as string[]).includes(
+              tournament.status as any
+            ) && (
               <Link
                 href={`/tournaments/${tournament.id}/bracket`}
                 className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"

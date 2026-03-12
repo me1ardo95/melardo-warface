@@ -14,6 +14,7 @@ import {
 export default function RegisterPage() {
   const [acceptedRules, setAcceptedRules] = useState(false);
   const [rulesError, setRulesError] = useState<string | null>(null);
+  const [showPwd, setShowPwd] = useState(false);
   const [state, formAction] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       const result = await signUp(formData);
@@ -92,17 +93,27 @@ export default function RegisterPage() {
             >
               Пароль
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              minLength={6}
-              autoComplete="new-password"
-              className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-              placeholder="Не менее 6 символов"
-              suppressHydrationWarning
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPwd ? "text" : "password"}
+                required
+                minLength={6}
+                autoComplete="new-password"
+                className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 pr-10 text-neutral-900 placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                placeholder="Не менее 6 символов"
+                suppressHydrationWarning
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd((v) => !v)}
+                aria-label={showPwd ? "Скрыть пароль" : "Показать пароль"}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-1 py-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+              >
+                👁️
+              </button>
+            </div>
           </div>
           <div>
             <label className="flex cursor-pointer items-start gap-2">

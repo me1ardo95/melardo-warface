@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   challengeId: string;
@@ -14,6 +15,7 @@ export function AcceptPublicChallengeButton({
   isOwn,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleClick = async () => {
     if (!myTeamId) {
@@ -32,8 +34,11 @@ export function AcceptPublicChallengeButton({
         alert(data?.error ?? "Не удалось принять вызов");
         return;
       }
-      alert("Вызов принят! Матч создан.");
-      window.location.reload();
+      if (data?.match?.id) {
+        router.push(`/matches/${data.match.id}`);
+      } else {
+        router.refresh();
+      }
     } catch {
       alert("Ошибка сети. Попробуйте позже.");
     } finally {
@@ -56,7 +61,7 @@ export function AcceptPublicChallengeButton({
       disabled={loading || !myTeamId}
       className="btn-primary text-xs uppercase tracking-wide"
     >
-      {loading ? "Создаём матч..." : "Играем?"}
+      {loading ? "Создаём матч..." : "ИГРАЕМ"}
     </button>
   );
 }

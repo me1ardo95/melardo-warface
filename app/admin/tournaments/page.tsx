@@ -7,11 +7,16 @@ import {
 import { AdminNav } from "../AdminNav";
 import { GenerateBracketButton } from "./GenerateBracketButton";
 import { DeleteTournamentButton } from "./DeleteTournamentButton";
+import { CreateDailyTournamentButton } from "./CreateDailyTournamentButton";
 
 const STATUS_LABELS: Record<string, string> = {
   upcoming: "Регистрация",
+  registration: "Регистрация",
+  starting: "Стартует",
   ongoing: "Идёт",
+  active: "Идёт",
   completed: "Завершён",
+  finished: "Завершён",
   cancelled: "Отменён",
 };
 
@@ -37,12 +42,15 @@ export default async function AdminTournamentsPage() {
               Создание, редактирование, генерация сетки и просмотр команд.
             </p>
           </div>
-          <Link
-            href="/admin/tournaments/create"
-            className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
-          >
-            Создать турнир
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <CreateDailyTournamentButton />
+            <Link
+              href="/admin/tournaments/create"
+              className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
+            >
+              Создать турнир
+            </Link>
+          </div>
         </div>
 
         {tournaments.length === 0 ? (
@@ -76,7 +84,8 @@ export default async function AdminTournamentsPage() {
                   const statusLabel = STATUS_LABELS[t.status] ?? t.status;
                   const modeLabel = (t.game ?? "—") as string;
                   const canGenerate =
-                    t.status === "upcoming" && !(t as { bracket_data?: unknown }).bracket_data;
+                    (t.status === "upcoming" || t.status === "registration") &&
+                    !(t as { bracket_data?: unknown }).bracket_data;
                   const maxTeams = (t as { max_teams?: number }).max_teams;
 
                   return (

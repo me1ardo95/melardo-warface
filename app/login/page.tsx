@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
   const [resetSubmitting, setResetSubmitting] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
 
   const [state, formAction] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
@@ -55,15 +56,25 @@ export default function LoginPage() {
             >
               Пароль
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-              suppressHydrationWarning
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPwd ? "text" : "password"}
+                required
+                autoComplete="current-password"
+                className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 pr-10 text-neutral-900 placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                suppressHydrationWarning
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd((v) => !v)}
+                aria-label={showPwd ? "Скрыть пароль" : "Показать пароль"}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-1 py-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+              >
+                👁️
+              </button>
+            </div>
           </div>
           <button
             type="submit"

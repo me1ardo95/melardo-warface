@@ -60,7 +60,10 @@ export default async function ProfileEditPage() {
           <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
             Измените ник в Warface. По нику в игре вас будут добавлять в команды.
           </p>
-          <ProfileEditForm warfaceNick={profile.warface_nick ?? null} />
+          <ProfileEditForm
+            warfaceNick={profile.warface_nick ?? null}
+            rank={(profile as { rank?: number | null }).rank ?? null}
+          />
         </div>
       </div>
     </div>

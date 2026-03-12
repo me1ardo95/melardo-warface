@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { PublicChallengeAccept } from "@/lib/types";
+import { createServiceClient } from "@/lib/supabase/service";
 import { sendNotification } from "@/lib/notifications";
+import { enqueueTelegramNotification } from "@/lib/telegram-queue";
+import {
+  generateSecretPhrase,
+  MIN_RANK_MATCH,
+} from "@/lib/warface";
+
+const COOLDOWN_HOURS = 24;
 
 export async function POST(request: Request) {
   try {
@@ -52,9 +59,25 @@ export async function POST(request: Request) {
       );
     }
 
+    // Проверка минимального ранга (26 для матчей)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("rank")
+      .eq("id", user.id)
+      .single();
+    const rank = profile?.rank ?? 1;
+    if (rank < MIN_RANK_MATCH) {
+      return NextResponse.json(
+        {
+          error: `Минимальный ранг для участия в матчах: ${MIN_RANK_MATCH}. Ваш ранг: ${rank}.`,
+        },
+        { status: 403 }
+      );
+    }
+
     const { data: challenge, error: challengeError } = await supabase
       .from("public_challenges")
-      .select("id, team_id, mode, scheduled_at, status, match_id")
+      .select("id, team_id, mode, map, format, rounds, scheduled_at, status, match_id")
       .eq("id", challengeId)
       .maybeSingle();
 
@@ -79,23 +102,67 @@ export async function POST(request: Request) {
       );
     }
 
-    const payload: PublicChallengeAccept = {
-      challenge_id: challenge.id,
-      team_id: teamId,
-    };
+    const challengerTeamId = challenge.team_id as string;
+    const accepterTeamId = teamId;
+
+    // Cooldown: команды не могут играть друг с другом более 1 матча в сутки
+    const since = new Date();
+    since.setHours(since.getHours() - COOLDOWN_HOURS);
+    const { data: recentMatches } = await supabase
+      .from("matches")
+      .select("id")
+      .or(
+        `and(team1_id.eq.${challengerTeamId},team2_id.eq.${accepterTeamId}),and(team1_id.eq.${accepterTeamId},team2_id.eq.${challengerTeamId})`
+      )
+      .gte("created_at", since.toISOString())
+      .limit(1);
+
+    if (recentMatches && recentMatches.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Эти команды уже играли друг с другом менее ${COOLDOWN_HOURS} часов назад. Создание второго матча заблокировано.`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Генерация Match ID, Lobby Code, Secret Phrase
+    let matchIdNumeric: number;
+    try {
+      const serviceSupabase = createServiceClient();
+      const { data: matchIdNumericRaw } = await serviceSupabase
+        .rpc("get_next_match_id_numeric")
+        .single();
+      matchIdNumeric =
+        typeof matchIdNumericRaw === "number"
+          ? matchIdNumericRaw
+          : Math.floor(10000 + Math.random() * 90000);
+    } catch {
+      matchIdNumeric = Math.floor(10000 + Math.random() * 90000);
+    }
+    const lobbyCode = `WF-${matchIdNumeric}`;
+    const secretPhrase = generateSecretPhrase();
 
     const { data: match, error: matchError } = await supabase
       .from("matches")
       .insert({
         tournament_id: null,
-        team1_id: challenge.team_id,
-        team2_id: payload.team_id,
-        status: "scheduled",
+        team1_id: challengerTeamId,
+        team2_id: accepterTeamId,
+        creator_team_id: challengerTeamId,
+        status: "awaiting_result",
         score_team1: 0,
         score_team2: 0,
         scheduled_at: challenge.scheduled_at,
+        match_id_numeric: matchIdNumeric,
+        lobby_code: lobbyCode,
+        secret_phrase: secretPhrase,
+        map: challenge.map ?? null,
+        team_size: challenge.mode ?? null,
+        format: challenge.format ?? "BO1",
+        rounds: challenge.rounds ?? "6 раундов, овертайм включен",
       })
-      .select("id, team1_id, team2_id, status, scheduled_at")
+      .select("id, team1_id, team2_id, status, scheduled_at, match_id_numeric, lobby_code, secret_phrase")
       .single();
 
     if (matchError || !match) {
@@ -111,7 +178,7 @@ export async function POST(request: Request) {
         status: "accepted",
         match_id: match.id,
       })
-      .eq("id", payload.challenge_id);
+      .eq("id", challengeId);
 
     if (updateError) {
       return NextResponse.json(
@@ -124,7 +191,7 @@ export async function POST(request: Request) {
       const { data: teamsData } = await supabase
         .from("teams")
         .select("id, name")
-        .in("id", [challenge.team_id, payload.team_id]);
+        .in("id", [challengerTeamId, accepterTeamId]);
 
       const teamsMap = new Map(
         (teamsData ?? []).map((t) => [t.id as string, t.name as string])
@@ -133,16 +200,16 @@ export async function POST(request: Request) {
       const { data: captainsData } = await supabase
         .from("team_members")
         .select("team_id, user_id")
-        .in("team_id", [challenge.team_id, payload.team_id])
+        .in("team_id", [challengerTeamId, accepterTeamId])
         .eq("role", "captain");
 
       const challengerName =
-        teamsMap.get(challenge.team_id as string) ?? "Команда 1";
+        teamsMap.get(challengerTeamId) ?? "Команда 1";
       const accepterName =
-        teamsMap.get(payload.team_id as string) ?? "Команда 2";
+        teamsMap.get(accepterTeamId) ?? "Команда 2";
 
       const challengerCaptains = (captainsData ?? []).filter(
-        (c) => c.team_id === challenge.team_id
+        (c) => c.team_id === challengerTeamId
       );
       const bothCaptains = captainsData ?? [];
 
@@ -174,6 +241,28 @@ export async function POST(request: Request) {
           matchMessage,
           `/matches/${match.id}`
         );
+      });
+
+      // Telegram: match_created + match_accepted for captains
+      const payloadBase = {
+        match_id: match.id,
+        lobby_code: (match as any).lobby_code ?? null,
+        secret_phrase: (match as any).secret_phrase ?? null,
+      };
+
+      bothCaptains.forEach((c) => {
+        const uid = c.user_id as string;
+        void enqueueTelegramNotification(uid, "match_created", {
+          ...payloadBase,
+        });
+      });
+
+      challengerCaptains.forEach((c) => {
+        const uid = c.user_id as string;
+        void enqueueTelegramNotification(uid, "match_accepted", {
+          ...payloadBase,
+          opponent: accepterName,
+        });
       });
     } catch {
       // уведомления не критичны

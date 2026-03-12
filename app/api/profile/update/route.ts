@@ -16,9 +16,10 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { warface_nick, avatar_url } = (body ?? {}) as {
+    const { warface_nick, avatar_url, rank } = (body ?? {}) as {
       warface_nick?: string;
       avatar_url?: string;
+      rank?: number;
     };
 
     if (!warface_nick || typeof warface_nick !== "string" || !warface_nick.trim()) {
@@ -57,13 +58,21 @@ export async function POST(request: Request) {
         ? avatar_url.trim()
         : null;
 
+    const rankValue =
+      rank !== undefined && typeof rank === "number" && Number.isInteger(rank) && rank >= 1 && rank <= 100
+        ? rank
+        : undefined;
+
+    const updateData: Record<string, unknown> = {
+      display_name: warfaceNickValue,
+      warface_nick: warfaceNickValue,
+      avatar_url: avatarUrlValue,
+    };
+    if (rankValue !== undefined) updateData.rank = rankValue;
+
     const { error } = await supabase
       .from("profiles")
-      .update({
-        display_name: warfaceNickValue,
-        warface_nick: warfaceNickValue,
-        avatar_url: avatarUrlValue,
-      })
+      .update(updateData)
       .eq("id", user.id);
 
     if (error) {

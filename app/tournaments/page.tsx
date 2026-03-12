@@ -3,15 +3,23 @@ import { getTournamentsWithDetails, getCurrentProfile } from "@/app/actions/data
 
 const TOURNAMENT_STATUS_LABELS: Record<string, string> = {
   upcoming: "Регистрация",
+  registration: "Регистрация",
+  starting: "Стартует",
   ongoing: "Идёт",
+  active: "Идёт",
   completed: "Завершён",
+  finished: "Завершён",
   cancelled: "Отменён",
 };
 
 const STATUS_COLORS: Record<string, string> = {
   upcoming: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+  registration: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
+  starting: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200",
   ongoing: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
+  active: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200",
   completed: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+  finished: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
 };
 
@@ -89,7 +97,7 @@ export default async function TournamentsPage() {
                       href={`/tournaments/${t.id}`}
                       className="rounded-md bg-[#11141A] px-4 py-2 text-sm font-medium text-white hover:bg-[#1F2933]"
                     >
-                      {t.status === "upcoming"
+                      {t.status === "upcoming" || t.status === "registration"
                         ? "Зарегистрироваться"
                         : "Подробнее"}
                     </Link>

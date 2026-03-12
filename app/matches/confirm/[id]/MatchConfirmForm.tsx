@@ -6,12 +6,14 @@ type Props = {
   matchId: string;
   team1Name?: string;
   team2Name?: string;
+  requireSecretPhrase?: boolean;
 };
 
 export default function MatchConfirmForm({
   matchId,
   team1Name = "Команда 1",
   team2Name = "Команда 2",
+  requireSecretPhrase = false,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -102,6 +104,28 @@ export default function MatchConfirmForm({
           />
         </div>
       </div>
+
+      {requireSecretPhrase && (
+        <div>
+          <label
+            htmlFor="secret_phrase"
+            className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+          >
+            Secret Phrase
+          </label>
+          <input
+            id="secret_phrase"
+            name="secret_phrase"
+            type="text"
+            required={requireSecretPhrase}
+            placeholder="Например: GOLD FALCON 73"
+            className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+          />
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+            Введите фразу, выданную при создании матча (2 слова + число).
+          </p>
+        </div>
+      )}
 
       <div>
         <label

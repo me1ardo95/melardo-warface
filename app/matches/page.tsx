@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUserTeamIds } from "@/app/actions/data";
+import {
+  getCurrentUserTeamIds,
+  getRecentMatchesWithDetails,
+} from "@/app/actions/data";
 import type { Match, PublicChallenge, Team } from "@/lib/types";
 import { RandomOpponentButton } from "./RandomOpponentButton";
 import { AcceptPublicChallengeButton } from "./AcceptPublicChallengeButton";
 
 const MATCH_STATUS_LABELS: Record<string, string> = {
-  scheduled: "запланирован",
-  live: "в игре",
+  scheduled: "ожидание соперника",
+  live: "матч начат",
+  awaiting_result: "ожидание результата",
   completed: "завершён",
   cancelled: "отменён",
   postponed: "отложен",
-  disputed: "оспаривается",
+  disputed: "спор",
 };
 
 function formatDate(iso: string | null) {
@@ -33,7 +37,11 @@ export default async function MatchesPage() {
   const myTeamIds = await getCurrentUserTeamIds();
   const primaryTeamId = myTeamIds[0] ?? null;
 
-  const [{ data: publicChallengesRaw }, { data: myMatchesRaw }] =
+  const [
+    { data: publicChallengesRaw },
+    { data: myMatchesRaw },
+    recentMatches,
+  ] =
     await Promise.all([
       supabase
         .from("public_challenges")
@@ -42,6 +50,7 @@ export default async function MatchesPage() {
           id,
           team_id,
           mode,
+          map,
           scheduled_at,
           comment,
           status,
@@ -84,10 +93,13 @@ export default async function MatchesPage() {
             `
             )
             .eq("id", "00000000-0000-0000-0000-000000000000"),
-    ]);
+    getRecentMatchesWithDetails(50),
+  ]);
 
   const publicChallenges = (publicChallengesRaw ?? []) as unknown as PublicChallengeWithTeam[];
   const myMatches = (myMatchesRaw ?? []) as unknown as MatchWithTeams[];
+  type MatchWithTournament = MatchWithTeams & { tournament?: { id: string; name: string } | null };
+  const historyMatches = (recentMatches ?? []) as MatchWithTournament[];
 
   return (
     <div className="space-y-6">
@@ -145,6 +157,11 @@ export default async function MatchesPage() {
                           <span className="rounded-full bg-[#1F2937] px-2 py-0.5 text-[11px] font-mono text-[#F97316]">
                             {c.mode}
                           </span>
+                          {c.map && (
+                            <span className="rounded-full bg-[#1F2937] px-2 py-0.5 text-[11px] text-[#9CA3AF]">
+                              {c.map}
+                            </span>
+                          )}
                         </div>
                         <p className="mt-1 text-xs text-[#9CA3AF]">
                           {c.comment || "Без комментария"}
@@ -203,6 +220,55 @@ export default async function MatchesPage() {
                       {formatDate(match.scheduled_at)}
                     </div>
                   </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="card-surface col-span-full p-6">
+          <h2 className="text-sm tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
+            История матчей
+          </h2>
+          <p className="mt-1 text-xs text-[#9CA3AF]">
+            Последние 50 матчей
+          </p>
+          {historyMatches.length === 0 ? (
+            <p className="mt-3 text-sm text-[#9CA3AF]">
+              Матчей пока нет.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-2 text-sm">
+              {historyMatches.map((match) => (
+                <li
+                  key={match.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#2A2F3A] bg-[#11141A] px-3 py-2"
+                >
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="font-medium text-white">
+                      {match.team1?.name ?? "—"} vs {match.team2?.name ?? "—"}
+                    </span>
+                    <span className="text-[#9CA3AF]">
+                      {match.score_team1} – {match.score_team2}
+                    </span>
+                    <span className="rounded bg-[#1F2937] px-2 py-0.5 text-[11px] text-[#E5E7EB]">
+                      {MATCH_STATUS_LABELS[match.status] ?? match.status}
+                    </span>
+                    {match.tournament?.name && (
+                      <Link
+                        href={`/tournaments/${match.tournament.id}`}
+                        className="text-xs text-[#F97316] hover:underline"
+                      >
+                        {match.tournament.name}
+                      </Link>
+                    )}
+                  </div>
+                  <Link
+                    href={`/matches/${match.id}`}
+                    className="text-xs text-[#6B7280] hover:text-white"
+                  >
+                    Подробнее
+                  </Link>
                 </li>
               ))}
             </ul>

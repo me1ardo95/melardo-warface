@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 type Props = { params: Promise<{ nick: string }> };
 
-export default async function ReferralRedirectPage({ params }: Props) {
+export default async function LegacyReferralRedirectPage({ params }: Props) {
   const { nick } = await params;
   const cookieStore = await cookies();
 

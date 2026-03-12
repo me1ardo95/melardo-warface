@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { enqueueTelegramNotification } from "@/lib/telegram-queue";
 import type {
   Team,
   Tournament,
@@ -427,12 +428,17 @@ export async function getTournamentsWithDetails(): Promise<TournamentWithDetails
   if (tournaments.length === 0) return [];
 
   const supabase = await createClient();
-  const { data: regs } = await supabase
-    .from("tournament_registrations")
-    .select("tournament_id");
+  const [{ data: regsV2 }, { data: regsLegacy }] = await Promise.all([
+    supabase.from("tournament_teams").select("tournament_id"),
+    supabase.from("tournament_registrations").select("tournament_id"),
+  ]);
 
   const countByTournament = new Map<string, number>();
-  (regs ?? []).forEach((r) => {
+  (regsV2 ?? []).forEach((r) => {
+    countByTournament.set(r.tournament_id, (countByTournament.get(r.tournament_id) ?? 0) + 1);
+  });
+  // если где-то ещё остались legacy регистрации — учтём их, но не задублируем
+  (regsLegacy ?? []).forEach((r) => {
     countByTournament.set(r.tournament_id, (countByTournament.get(r.tournament_id) ?? 0) + 1);
   });
 
@@ -532,6 +538,30 @@ export async function getMatchesWithDetails(): Promise<
   })[];
 }
 
+export async function getRecentMatchesWithDetails(limit = 50): Promise<
+  (Match & { team1?: Team; team2?: Team; tournament?: Tournament })[]
+> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("matches")
+    .select(
+      `
+      *,
+      team1:teams!matches_team1_id_fkey(id, name, logo_url),
+      team2:teams!matches_team2_id_fkey(id, name, logo_url),
+      tournament:tournaments(id, name, game, status)
+    `
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as (Match & {
+    team1?: Team;
+    team2?: Team;
+    tournament?: Tournament;
+  })[];
+}
+
 export async function createMatch(formData: FormData) {
   const supabase = await createClient();
   const tournament_id = (formData.get("tournament_id") as string) || null;
@@ -541,7 +571,9 @@ export async function createMatch(formData: FormData) {
   const score_team1 = parseInt((formData.get("score_team1") as string) || "0", 10);
   const score_team2 = parseInt((formData.get("score_team2") as string) || "0", 10);
   const scheduled_at = (formData.get("scheduled_at") as string) || null;
-  const { error } = await supabase.from("matches").insert({
+  const { data, error } = await supabase
+    .from("matches")
+    .insert({
     tournament_id,
     team1_id,
     team2_id,
@@ -549,8 +581,26 @@ export async function createMatch(formData: FormData) {
     score_team1,
     score_team2,
     scheduled_at: scheduled_at || null,
-  });
-  if (error) return { error: error.message };
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message ?? "Не удалось создать матч" };
+
+  // Telegram: match_created for captains of both teams (if any)
+  try {
+    const { data: captains } = await supabase
+      .from("team_members")
+      .select("user_id")
+      .in("team_id", [team1_id, team2_id].filter(Boolean));
+    (captains ?? []).forEach((c) => {
+      void enqueueTelegramNotification(c.user_id as string, "match_created", {
+        match_id: data.id,
+      });
+    });
+  } catch {
+    // уведомления не критичны
+  }
+
   revalidatePath("/matches");
   return {};
 }
@@ -632,6 +682,106 @@ export type PlayerRankingRow = {
   avatar_url: string | null;
   is_free_agent: boolean;
 };
+
+export async function getPlayersRankingByPeriod(
+  limit: number,
+  days: number
+): Promise<PlayerRankingRow[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data: history } = await supabase
+    .from("profile_points_history")
+    .select("profile_id, delta")
+    .gte("created_at", since.toISOString());
+
+  const pointsByUser = new Map<string, number>();
+  (history ?? []).forEach((h) => {
+    pointsByUser.set(h.profile_id, (pointsByUser.get(h.profile_id) ?? 0) + (h.delta ?? 0));
+  });
+
+  const userIds = [...pointsByUser.keys()].slice(0, limit * 2);
+  if (userIds.length === 0) return [];
+
+  const [{ data: profiles }, { data: members }, { data: teams }] = await Promise.all([
+    supabase.from("profiles").select("id, warface_nick, display_name, avatar_url").in("id", userIds),
+    supabase.from("team_members").select("user_id, team_id"),
+    supabase.from("teams").select("id, name"),
+  ]);
+
+  const teamById = new Map((teams ?? []).map((t) => [t.id, t.name]));
+  const teamByUser = new Map<string, string>();
+  (members ?? []).forEach((m) => {
+    const name = teamById.get(m.team_id) ?? null;
+    if (name) teamByUser.set(m.user_id, name);
+  });
+
+  return (profiles ?? [])
+    .filter((p) => (pointsByUser.get(p.id) ?? 0) > 0)
+    .map((p) => ({
+      id: p.id,
+      warface_nick: p.warface_nick ?? p.display_name ?? null,
+      points: pointsByUser.get(p.id) ?? 0,
+      wins: 0,
+      team_name: teamByUser.get(p.id) ?? null,
+      avatar_url: p.avatar_url ?? null,
+      is_free_agent: !teamByUser.get(p.id),
+    }))
+    .sort((a, b) => b.points - a.points)
+    .slice(0, limit);
+}
+
+export async function getTeamsRankingByPeriod(
+  limit: number,
+  days: number
+): Promise<TeamRankingRow[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data: history } = await supabase
+    .from("team_points_history")
+    .select("team_id, delta")
+    .gte("created_at", since.toISOString());
+
+  const pointsByTeam = new Map<string, number>();
+  (history ?? []).forEach((h) => {
+    pointsByTeam.set(h.team_id, (pointsByTeam.get(h.team_id) ?? 0) + (h.delta ?? 0));
+  });
+
+  const teamIds = [...pointsByTeam.keys()];
+  if (teamIds.length === 0) return [];
+
+  const { data: teams } = await supabase.from("teams").select("*").in("id", teamIds);
+  const winsByTeam = new Map<string, number>();
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("team1_id, team2_id, score_team1, score_team2")
+    .eq("status", "completed")
+    .gte("completed_at", since.toISOString());
+
+  (matches ?? []).forEach((m) => {
+    if (!m.team1_id || !m.team2_id) return;
+    const t1Won = (m.score_team1 ?? 0) > (m.score_team2 ?? 0);
+    winsByTeam.set(m.team1_id, (winsByTeam.get(m.team1_id) ?? 0) + (t1Won ? 1 : 0));
+    winsByTeam.set(m.team2_id, (winsByTeam.get(m.team2_id) ?? 0) + (t1Won ? 0 : 1));
+  });
+
+  return (teams ?? [])
+    .filter((t) => (pointsByTeam.get(t.id) ?? 0) > 0)
+    .map((t) => ({
+      id: t.id,
+      name: t.name,
+      logo_url: t.logo_url,
+      points: pointsByTeam.get(t.id) ?? 0,
+      wins: winsByTeam.get(t.id) ?? 0,
+      matches: 0,
+      last_results: [],
+    }))
+    .sort((a, b) => b.points - a.points)
+    .slice(0, limit);
+}
 
 export async function getPlayersRanking(limit = 100): Promise<PlayerRankingRow[]> {
   const supabase = await createClient();

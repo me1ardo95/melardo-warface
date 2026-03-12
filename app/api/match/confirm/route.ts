@@ -4,6 +4,12 @@ import { sendNotification } from "@/lib/notifications";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logSystemError } from "@/lib/system-log";
+import { normalizeSecretPhrase } from "@/lib/warface";
+import { updateTrustScoreOnMatchComplete, updateTrustScoreOnDispute } from "@/app/actions/trust-score";
+import { enqueueTelegramNotification } from "@/lib/telegram-queue";
+import { updateMissionProgressOnMatchComplete } from "@/lib/missions";
+import { updateClanRatingOnMatchComplete } from "@/lib/clan-rating";
+import { onTournamentMatchCompleted } from "@/lib/tournament-flow";
 
 const BUCKET = "match-screenshots";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -17,71 +23,21 @@ async function isFinalTournamentMatch(
   supabase: Awaited<ReturnType<typeof createClient>>,
   matchId: string
 ): Promise<boolean> {
+  const { data: bracket } = await supabase
+    .from("tournament_brackets")
+    .select("round")
+    .eq("match_id", matchId)
+    .limit(1)
+    .maybeSingle();
+  if (bracket) {
+    return String((bracket as any).round ?? "") === "final";
+  }
   const { data } = await supabase
     .from("matches")
     .select("next_match_id")
     .eq("id", matchId)
     .single();
-  if (!data) return false;
-  return data.next_match_id === null;
-}
-
-async function progressBracketWinner(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  matchId: string,
-  winnerTeamId: string | null
-): Promise<void> {
-  if (!winnerTeamId) return;
-
-  const { data: matchRow } = await supabase
-    .from("matches")
-    .select("tournament_id, next_match_id")
-    .eq("id", matchId)
-    .single();
-
-  if (!matchRow) return;
-
-  const tournamentId = matchRow.tournament_id as string | null;
-  const nextMatchId = matchRow.next_match_id as string | null;
-
-  if (!tournamentId) return;
-
-  if (!nextMatchId) {
-    await supabase
-      .from("tournaments")
-      .update({
-        status: "completed",
-        winner_team_id: winnerTeamId,
-      })
-      .eq("id", tournamentId)
-      .neq("status", "completed");
-    return;
-  }
-
-  const { data: nextMatchRow } = await supabase
-    .from("matches")
-    .select("team1_id, team2_id")
-    .eq("id", nextMatchId)
-    .single();
-
-  if (!nextMatchRow) return;
-
-  if (!nextMatchRow.team1_id) {
-    await supabase
-      .from("matches")
-      .update({ team1_id: winnerTeamId })
-      .eq("id", nextMatchId)
-      .is("team1_id", null);
-    return;
-  }
-
-  if (!nextMatchRow.team2_id) {
-    await supabase
-      .from("matches")
-      .update({ team2_id: winnerTeamId })
-      .eq("id", nextMatchId)
-      .is("team2_id", null);
-  }
+  return data?.next_match_id === null;
 }
 
 export async function POST(request: Request) {
@@ -107,6 +63,7 @@ export async function POST(request: Request) {
     const score2 = Number(formData.get("score_team2"));
     const agree = formData.get("agree") === "on";
     const screenshot = formData.get("screenshot");
+    const secretPhraseRaw = String(formData.get("secret_phrase") || "").trim();
 
     if (!matchId) return apiError("Не указан матч", 400);
     if (!Number.isFinite(score1) || !Number.isFinite(score2)) {
@@ -136,11 +93,21 @@ export async function POST(request: Request) {
 
     const { data: match } = await supabase
       .from("matches")
-      .select("id, team1_id, team2_id, status, tournament_id, points_awarded")
+      .select("id, team1_id, team2_id, status, tournament_id, points_awarded, secret_phrase, map")
       .eq("id", matchId)
       .single();
 
     if (!match) return apiError("Матч не найден", 404);
+
+    const storedSecretPhrase = (match as { secret_phrase?: string | null }).secret_phrase;
+    if (storedSecretPhrase) {
+      if (!secretPhraseRaw) {
+        return apiError("Укажите Secret Phrase из матча", 400);
+      }
+      if (normalizeSecretPhrase(secretPhraseRaw) !== normalizeSecretPhrase(storedSecretPhrase)) {
+        return apiError("Secret Phrase указана неверно", 400);
+      }
+    }
 
     if (["completed", "cancelled", "disputed"].includes(match.status)) {
       return apiError(
@@ -252,28 +219,37 @@ export async function POST(request: Request) {
       .from(BUCKET)
       .getPublicUrl(filePath).data.publicUrl;
 
+    const insertPayload: Record<string, unknown> = {
+      match_id: matchId,
+      captain_id: user.id,
+      team_id: membership.team_id,
+      score_team1: score1,
+      score_team2: score2,
+      screenshot_url: screenshotUrl,
+      status: "pending",
+    };
+    if (storedSecretPhrase) {
+      insertPayload.secret_phrase = secretPhraseRaw ? normalizeSecretPhrase(secretPhraseRaw) : null;
+    }
+
     const { error: insertError } = await supabase
       .from("match_confirmations")
-      .upsert(
-        {
-          match_id: matchId,
-          captain_id: user.id,
-          team_id: membership.team_id,
-          score_team1: score1,
-          score_team2: score2,
-          screenshot_url: screenshotUrl,
-          status: "pending",
-        },
-        { onConflict: "match_id,captain_id" }
-      );
+      .upsert(insertPayload, { onConflict: "match_id,captain_id" });
 
     if (insertError) {
       return apiError(insertError.message, 400);
     }
 
+    // Telegram: match_result_submitted for current captain
+    void enqueueTelegramNotification(user.id, "match_result_submitted", {
+      match_id: matchId,
+      score_team1: score1,
+      score_team2: score2,
+    });
+
     const { data: confirmations } = await supabase
       .from("match_confirmations")
-      .select("id, team_id, score_team1, score_team2, status")
+      .select("id, team_id, score_team1, score_team2, status, screenshot_url, secret_phrase")
       .eq("match_id", matchId);
 
     const confirmationList = confirmations ?? [];
@@ -283,14 +259,29 @@ export async function POST(request: Request) {
       if (!c1 || !c2) {
         return apiError("Ошибка при проверке подтверждений", 500);
       }
+      const c1Sp = (c1 as { secret_phrase?: string | null }).secret_phrase;
+      const c2Sp = (c2 as { secret_phrase?: string | null }).secret_phrase;
+      const storedSp = storedSecretPhrase;
+      const sameSecretPhrase =
+        !storedSp || (c1Sp && c2Sp && normalizeSecretPhrase(c1Sp) === normalizeSecretPhrase(storedSp) && normalizeSecretPhrase(c2Sp) === normalizeSecretPhrase(storedSp));
       const sameScore =
         c1.score_team1 === c2.score_team1 && c1.score_team2 === c2.score_team2;
+      const bothHaveScreenshot = !!c1.screenshot_url && !!c2.screenshot_url;
 
-      if (sameScore) {
+      if (sameScore && sameSecretPhrase && bothHaveScreenshot) {
         await supabase
           .from("match_confirmations")
           .update({ status: "confirmed" })
           .eq("match_id", matchId);
+
+        const { data: confWithScreenshot } = await supabase
+          .from("match_confirmations")
+          .select("screenshot_url")
+          .eq("match_id", matchId)
+          .limit(1)
+          .maybeSingle();
+
+        const screenshotUrl = confWithScreenshot?.screenshot_url ?? null;
 
         const { data: updatedMatch, error: matchUpdateError } = await supabase
           .from("matches")
@@ -300,6 +291,7 @@ export async function POST(request: Request) {
             score_team2: c1.score_team2,
             completed_at: new Date().toISOString(),
             points_awarded: true,
+            screenshot_url: screenshotUrl,
           })
           .eq("id", matchId)
           .eq("points_awarded", false)
@@ -371,7 +363,36 @@ export async function POST(request: Request) {
               });
             }
 
-            await progressBracketWinner(supabase, matchId, winnerId);
+            if (tournamentId) {
+              await onTournamentMatchCompleted({
+                supabase,
+                matchId,
+                tournamentId,
+                winnerTeamId: winnerId,
+              });
+            }
+
+            const { data: allMembers } = await supabase
+              .from("team_members")
+              .select("user_id")
+              .in("team_id", [updatedMatch.team1_id, updatedMatch.team2_id]);
+            const participantIds = [...new Set((allMembers ?? []).map((m) => m.user_id as string))];
+            void updateMissionProgressOnMatchComplete(participantIds, {
+              team1_id: updatedMatch.team1_id!,
+              team2_id: updatedMatch.team2_id!,
+              score_team1: c1.score_team1,
+              score_team2: c1.score_team2,
+              map: (match as { map?: string | null }).map ?? null,
+              winner_team_id: winnerId,
+            });
+
+            void updateClanRatingOnMatchComplete(
+              matchId,
+              updatedMatch.team1_id!,
+              updatedMatch.team2_id!,
+              c1.score_team1,
+              c1.score_team2
+            );
           }
         }
 
@@ -381,6 +402,9 @@ export async function POST(request: Request) {
             .select("team_id, user_id")
             .in("team_id", [team1Id, team2Id])
             .eq("role", "captain");
+
+          const captainUserIds = (captainsData ?? []).map((c) => c.user_id as string);
+          void updateTrustScoreOnMatchComplete(captainUserIds, matchId);
 
           const title = "Результат матча подтверждён";
           const message =
@@ -395,6 +419,18 @@ export async function POST(request: Request) {
               `/matches/${matchId}`
             );
           });
+
+          // Telegram: match_confirmed + match_finished for captains
+          (captainsData ?? []).forEach((c) => {
+            const uid = c.user_id as string;
+            const payload = {
+              match_id: matchId,
+              score_team1: c1.score_team1,
+              score_team2: c1.score_team2,
+            };
+            void enqueueTelegramNotification(uid, "match_confirmed", payload);
+            void enqueueTelegramNotification(uid, "match_finished", payload);
+          });
         } catch {
           // уведомления не критичны
         }
@@ -406,11 +442,47 @@ export async function POST(request: Request) {
         });
       }
 
+      const disputeReason =
+        !sameSecretPhrase
+          ? "Secret Phrase указана неверно"
+          : !bothHaveScreenshot
+            ? "Отсутствует скриншот результата"
+            : "Несовпадение счёта при подтверждении командами";
+
       await supabase
         .from("match_confirmations")
         .update({ status: "disputed" })
         .eq("match_id", matchId);
+
+      await supabase.from("match_disputes").insert({
+        match_id: matchId,
+        reported_by_team_id: null,
+        reason: disputeReason,
+        status: "open",
+      });
+
       await supabase.from("matches").update({ status: "disputed" }).eq("id", matchId);
+
+      const { data: disputeCaptains } = await supabase
+        .from("team_members")
+        .select("user_id")
+        .in("team_id", [team1Id, team2Id])
+        .eq("role", "captain");
+      const disputeCaptainIds = (disputeCaptains ?? []).map((c) => c.user_id as string);
+      void updateTrustScoreOnDispute(disputeCaptainIds);
+
+      // Telegram: match_dispute_created for captains and admin alert
+      (disputeCaptains ?? []).forEach((c) => {
+        void enqueueTelegramNotification(c.user_id as string, "match_dispute_created", {
+          match_id: matchId,
+          reason: disputeReason,
+        });
+      });
+      void enqueueTelegramNotification(null, "admin_alert_dispute", {
+        match_id: matchId,
+        players: null,
+        link: `/matches/${matchId}`,
+      });
 
       return apiSuccess({
         success: true,

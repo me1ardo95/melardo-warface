@@ -15,7 +15,16 @@ type MatchWithRelations = Match & {
   tournament?: Pick<Tournament, "id" | "name" | "status"> | null;
 };
 
-async function getMatch(id: string): Promise<MatchWithRelations | null> {
+type MatchWithWarface = MatchWithRelations & {
+  match_id_numeric?: number | null;
+  lobby_code?: string | null;
+  secret_phrase?: string | null;
+  map?: string | null;
+  team_size?: string | null;
+  creator_team_id?: string | null;
+};
+
+async function getMatch(id: string): Promise<MatchWithWarface | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("matches")
@@ -30,13 +39,23 @@ async function getMatch(id: string): Promise<MatchWithRelations | null> {
     .eq("id", id)
     .single();
   if (error || !data) return null;
-  return data as MatchWithRelations;
+  return data as MatchWithWarface;
 }
 
 function formatDate(iso: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("ru-RU");
 }
+
+const MATCH_STATUS_LABELS: Record<string, string> = {
+  scheduled: "ожидание соперника",
+  live: "матч начат",
+  awaiting_result: "ожидание результата",
+  completed: "завершён",
+  cancelled: "отменён",
+  postponed: "отложен",
+  disputed: "спор",
+};
 
 export default async function MatchPage({ params }: Props) {
   const { id } = await params;
@@ -46,6 +65,8 @@ export default async function MatchPage({ params }: Props) {
   const title = `${match.team1?.name ?? "Команда 1"} vs ${
     match.team2?.name ?? "Команда 2"
   }`;
+  const hasWarfaceData =
+    match.match_id_numeric ?? match.lobby_code ?? match.secret_phrase;
 
   return (
     <div className="min-h-screen p-6">
@@ -74,9 +95,49 @@ export default async function MatchPage({ params }: Props) {
           </h1>
 
           <dl className="mt-4 space-y-1 text-sm text-neutral-600 dark:text-neutral-300">
+            {hasWarfaceData && (
+              <>
+                {match.match_id_numeric != null && (
+                  <div className="flex justify-between">
+                    <dt>Match ID</dt>
+                    <dd className="font-mono font-medium text-neutral-900 dark:text-neutral-100">
+                      {match.match_id_numeric}
+                    </dd>
+                  </div>
+                )}
+                {match.lobby_code && (
+                  <div className="flex justify-between">
+                    <dt>Lobby Code</dt>
+                    <dd className="font-mono font-medium text-neutral-900 dark:text-neutral-100">
+                      {match.lobby_code}
+                    </dd>
+                  </div>
+                )}
+                {match.secret_phrase && (
+                  <div className="flex justify-between">
+                    <dt>Secret Phrase</dt>
+                    <dd className="font-mono font-medium text-neutral-900 dark:text-neutral-100">
+                      {match.secret_phrase}
+                    </dd>
+                  </div>
+                )}
+                {match.map && (
+                  <div className="flex justify-between">
+                    <dt>Карта</dt>
+                    <dd>{match.map}</dd>
+                  </div>
+                )}
+                {match.team_size && (
+                  <div className="flex justify-between">
+                    <dt>Размер команды</dt>
+                    <dd>{match.team_size}</dd>
+                  </div>
+                )}
+              </>
+            )}
             <div className="flex justify-between">
               <dt>Статус</dt>
-              <dd>{match.status}</dd>
+              <dd>{MATCH_STATUS_LABELS[match.status] ?? match.status}</dd>
             </div>
             <div className="flex justify-between">
               <dt>Счёт</dt>
@@ -107,13 +168,23 @@ export default async function MatchPage({ params }: Props) {
             )}
           </dl>
 
+          {hasWarfaceData && match.lobby_code && (
+            <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
+              Создайте комнату в Warface с названием{" "}
+              <strong className="font-mono">{match.lobby_code}</strong> (закрытая
+              комната). Комнату создаёт команда, которая создала вызов.
+            </p>
+          )}
+
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href={`/matches/confirm/${match.id}`}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Подтвердить результат
-            </Link>
+            {!["completed", "cancelled", "disputed"].includes(match.status) && (
+              <Link
+                href={`/matches/confirm/${match.id}`}
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Подтвердить результат
+              </Link>
+            )}
             <ComplaintButton
               matchId={match.id}
               className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-950"

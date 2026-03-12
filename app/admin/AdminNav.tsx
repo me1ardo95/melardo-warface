@@ -11,6 +11,8 @@ type AdminNavSection =
   | "complaints"
   | "players"
   | "teams"
+  | "users"
+  | "logs"
   | "seasons";
 
 const navItems: { key: AdminNavSection; href: string; label: string }[] = [
@@ -28,6 +30,8 @@ const navItems: { key: AdminNavSection; href: string; label: string }[] = [
   { key: "complaints", href: "/admin/complaints", label: "🚨 Жалобы" },
   { key: "players", href: "/admin/players", label: "👥 Игроки" },
   { key: "teams", href: "/admin/teams", label: "🏢 Команды" },
+  { key: "users", href: "/admin/users", label: "👤 Пользователи" },
+  { key: "logs", href: "/admin/logs", label: "📋 Логи" },
   { key: "seasons", href: "/admin/seasons", label: "📅 Сезоны" },
 ];
 
