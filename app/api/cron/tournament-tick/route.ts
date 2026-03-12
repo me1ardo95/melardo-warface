@@ -1,3 +1,21 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  // Проверка авторизации
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
+  // Здесь будет твоя логика
+  console.log('Cron job executed at', new Date().toISOString());
+  
+  return NextResponse.json({ 
+    success: true, 
+    message: 'Tournament tick executed',
+    timestamp: new Date().toISOString()
+  });
+}
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { generateBracket } from "@/lib/bracket";
