@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/tournament-tick",
+      "path": "/api/cron/do-tick",
       "schedule": "*/5 * * * *"
     },
     {
