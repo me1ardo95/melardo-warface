@@ -21,6 +21,14 @@ export default function LoginPage() {
     null
   );
 
+  // Функция для перевода ошибок
+  const getTranslatedError = (error: string) => {
+    if (error.includes('Email not confirmed')) {
+      return 'Email не подтверждён. Проверьте вашу почту и перейдите по ссылке из письма.';
+    }
+    return error;
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
@@ -28,7 +36,7 @@ export default function LoginPage() {
         <form action={formAction} className="space-y-4">
           {state?.error && (
             <p className="text-sm text-red-600 dark:text-red-400">
-              {state.error}
+              {getTranslatedError(state.error)}
             </p>
           )}
           <div>
