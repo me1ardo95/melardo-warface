@@ -1,12 +1,12 @@
 {
   "crons": [
     {
-      "path": "/api/cron/do-tick",
-      "schedule": "*/5 * * * *"
+      "path": "/api/cron-tasks/do-tick",
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/notification-worker",
-      "schedule": "*/1 * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/mission-generator",
