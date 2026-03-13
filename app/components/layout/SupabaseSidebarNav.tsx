@@ -209,8 +209,8 @@ export function SupabaseSidebarNav() {
   }, [groups, hasUser, isAdmin]);
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-dvh w-16 flex-col bg-[#0A0C0F]">
-      <div className="h-20 shrink-0 border-b border-white/5">
+    <aside className="fixed left-0 top-0 z-40 flex h-dvh w-16 flex-col bg-[#2d2d2d] text-[#ccc]">
+      <div className="h-20 shrink-0 border-b border-[#3d3d3d]">
         <Link
           href="/"
           className="flex h-full w-full items-center justify-center"
@@ -222,7 +222,7 @@ export function SupabaseSidebarNav() {
               alt="MELARDO WARFACE"
               className="h-10 w-10 object-contain"
             />
-            <span className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-white/90">
+            <span className="mt-1 text-[9px] font-semibold tracking-[0.18em] text-[#ccc]">
               MELARDO
             </span>
           </div>
@@ -246,21 +246,21 @@ export function SupabaseSidebarNav() {
                 >
                   <Link
                     href={g.primaryHref}
-                    className="flex h-10 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
+                    className="flex h-10 w-full items-center justify-center rounded-md text-[#ccc] hover:bg-[#3d3d3d] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3d3d3d] transition-colors duration-200"
                     aria-label={g.label}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-7 w-7" />
                   </Link>
 
                   <div className="absolute left-full top-0 z-50 pl-2">
                     <div
                       className={[
-                        "w-[200px] origin-left rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40",
-                        "transition-all duration-150 ease-out",
+                        "w-[200px] origin-left rounded-lg border border-[#3d3d3d] bg-[#2d2d2d] p-2 shadow-2xl shadow-black/40",
+                        "transition-all duration-200 ease-out",
                         isOpen ? "translate-x-0 opacity-100" : "translate-x-1 opacity-0 pointer-events-none",
                       ].join(" ")}
                     >
-                      <div className="px-2 pb-1 pt-1 text-[11px] font-semibold tracking-wide text-white/60">
+                      <div className="px-2 pb-1 pt-1 text-[11px] font-semibold tracking-wide text-[#ccc]">
                         {g.label}
                       </div>
                       <div className="mt-1 space-y-1">
@@ -268,7 +268,7 @@ export function SupabaseSidebarNav() {
                           <Link
                             key={l.href + l.label}
                             href={l.href}
-                            className="block rounded-md px-2 py-1.5 text-sm text-white/80 hover:bg-white/5 hover:text-white"
+                            className="block rounded-md px-2 py-1.5 text-sm text-[#ccc] hover:bg-[#3d3d3d] hover:text-white transition-colors duration-200"
                           >
                             {l.label}
                           </Link>
@@ -290,14 +290,14 @@ export function SupabaseSidebarNav() {
       </div>
 
       {hasUser && (
-        <div className="shrink-0 border-t border-white/5 px-1.5 pb-2 pt-2">
+        <div className="shrink-0 border-t border-[#3d3d3d] px-1.5 pb-2 pt-2">
           <form action={signOut}>
             <button
               type="submit"
-              className="flex h-9 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
+              className="flex h-9 w-full items-center justify-center rounded-md text-[#ccc] hover:bg-[#3d3d3d] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3d3d3d] transition-colors duration-200"
               aria-label="Выйти"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-7 w-7" />
             </button>
           </form>
         </div>
