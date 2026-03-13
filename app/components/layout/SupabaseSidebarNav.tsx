@@ -163,64 +163,28 @@ export function SupabaseSidebarNav() {
         links: [
           { label: "Команды", href: "/rankings?tab=teams" },
           { label: "Игроки", href: "/rankings?tab=players" },
-          { label: "Таблица лидеров", href: "/leaderboard" },
         ],
-      },
-      {
-        key: "missions",
-        icon: Target,
-        label: "Миссии",
-        primaryHref: "/missions",
-        authedOnly: true,
-        links: [{ label: "Миссии", href: "/missions" }],
-      },
-      {
-        key: "season",
-        icon: Calendar,
-        label: "Сезон",
-        primaryHref: "/season",
-        authedOnly: true,
-        links: [
-          { label: "Текущий сезон", href: "/season" },
-          { label: "Архив", href: "/league/archive" },
-        ],
-      },
-      {
-        key: "stats",
-        icon: LineChart,
-        label: "Статистика",
-        primaryHref: "/stats",
-        authedOnly: true,
-        links: [{ label: "Статистика", href: "/stats" }],
-      },
-      {
-        key: "quick",
-        icon: Zap,
-        label: "Быстрый матч",
-        primaryHref: "/quick-match",
-        authedOnly: true,
-        links: [{ label: "Поиск соперника", href: "/quick-match" }],
       },
       {
         key: "rules",
         icon: ScrollText,
         label: "Правила",
         primaryHref: "/rules",
-        links: [{ label: "Правила платформы", href: "/rules" }],
+        links: [{ label: "Правила", href: "/rules" }],
       },
       {
         key: "guide",
         icon: BookOpen,
         label: "Руководство",
         primaryHref: "/guide",
-        links: [{ label: "Как пользоваться", href: "/guide" }],
+        links: [{ label: "Руководство", href: "/guide" }],
       },
       {
         key: "support",
         icon: Heart,
         label: "Поддержать проект",
         primaryHref: "/support",
-        links: [{ label: "Донат", href: "/support" }],
+        links: [{ label: "Поддержать проект", href: "/support" }],
       },
       {
         key: "admin",
@@ -228,12 +192,7 @@ export function SupabaseSidebarNav() {
         label: "Админка",
         primaryHref: "/admin",
         adminOnly: true,
-        links: [
-          { label: "Панель управления", href: "/admin" },
-          { label: "Пользователи", href: "/admin/players" },
-          { label: "Турниры", href: "/admin/tournaments" },
-          { label: "Жалобы", href: "/admin/complaints" },
-        ],
+        links: [{ label: "Админка", href: "/admin" }],
       },
     ],
     [myTeamHref]
@@ -249,8 +208,8 @@ export function SupabaseSidebarNav() {
   }, [groups, hasUser, isAdmin]);
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-dvh w-16 bg-[#0A0C0F]">
-      <div className="h-20 border-b border-white/5">
+    <aside className="fixed left-0 top-0 z-40 flex h-dvh w-16 flex-col bg-[#0A0C0F]">
+      <div className="h-20 shrink-0 border-b border-white/5">
         <Link
           href="/"
           className="flex h-full w-full items-center justify-center"
@@ -269,8 +228,8 @@ export function SupabaseSidebarNav() {
         </Link>
       </div>
 
-      <div className="h-[calc(100dvh-5rem)] overflow-y-auto py-2">
-        <nav className="flex flex-col items-center gap-1 px-2">
+      <div className="sidebar-scroll flex-1 overflow-y-auto py-1">
+        <nav className="flex flex-col items-center gap-0.5 px-1.5">
           {visibleGroups.map((g) => {
             const Icon = g.icon;
             return (
@@ -281,14 +240,14 @@ export function SupabaseSidebarNav() {
                 <div className="group relative">
                   <Link
                     href={g.primaryHref}
-                    className="flex h-10 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
+                    className="flex h-9 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
                     aria-label={g.label}
                   >
                     <Icon className="h-5 w-5" />
                   </Link>
 
-                  <div className="pointer-events-none absolute left-[calc(100%+10px)] top-0">
-                    <div className="pointer-events-auto w-[220px] origin-left translate-x-2 opacity-0 transition-all duration-150 ease-out group-hover:translate-x-0 group-hover:opacity-100 rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40">
+                  <div className="pointer-events-none absolute left-full top-0">
+                    <div className="pointer-events-auto ml-1 w-[200px] origin-left translate-x-1 opacity-0 transition-all duration-150 ease-out group-hover:translate-x-0 group-hover:opacity-100 rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40">
                       <div className="px-2 pb-1 pt-1 text-[11px] font-semibold tracking-wide text-white/60">
                         {g.label}
                       </div>
@@ -315,40 +274,22 @@ export function SupabaseSidebarNav() {
             );
           })}
 
-          {hasUser && (
-            <div className="relative mt-2 w-full px-2">
-              <div className="h-px w-full bg-white/5" />
-              <div className="group relative mt-2">
-                <form action={signOut}>
-                  <button
-                    type="submit"
-                    className="flex h-10 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
-                    aria-label="Выйти"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </button>
-                </form>
-
-                <div className="pointer-events-none absolute left-[calc(100%+10px)] top-0">
-                  <div className="pointer-events-auto w-[220px] origin-left translate-x-2 opacity-0 transition-all duration-150 ease-out group-hover:translate-x-0 group-hover:opacity-100 rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40">
-                    <div className="px-2 pb-1 pt-1 text-[11px] font-semibold tracking-wide text-white/60">
-                      Аккаунт
-                    </div>
-                    <div className="mt-1 space-y-1">
-                      <button
-                        type="submit"
-                        className="w-full rounded-md px-2 py-1.5 text-left text-sm text-white/80 hover:bg-white/5 hover:text-white"
-                      >
-                        Выйти
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </nav>
       </div>
+
+      {hasUser && (
+        <div className="shrink-0 border-t border-white/5 px-1.5 pb-2 pt-2">
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="flex h-9 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
+              aria-label="Выйти"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </form>
+        </div>
+      )}
     </aside>
   );
 }

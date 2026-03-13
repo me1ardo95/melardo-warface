@@ -54,6 +54,15 @@ body {
     "Segoe UI", sans-serif;
 }
 
+.sidebar-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .card-surface {
   border-radius: 12px;
   border: 1px solid var(--card-border);
