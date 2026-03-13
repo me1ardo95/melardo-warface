@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Home,
   User,
@@ -43,6 +43,22 @@ export function SupabaseSidebarNav() {
   const [hasUser, setHasUser] = useState<boolean>(false);
   const [myTeamHref, setMyTeamHref] = useState<string>("/teams");
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openPanel = (key: string) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setActiveKey(key);
+  };
+
+  const scheduleClosePanel = (key: string) => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setActiveKey((prev) => (prev === key ? null : prev));
+    }, 120);
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -241,8 +257,8 @@ export function SupabaseSidebarNav() {
               >
                 <div
                   className="relative"
-                  onMouseEnter={() => setActiveKey(g.key)}
-                  onMouseLeave={() => setActiveKey((prev) => (prev === g.key ? null : prev))}
+                  onMouseEnter={() => openPanel(g.key)}
+                  onMouseLeave={() => scheduleClosePanel(g.key)}
                 >
                   <Link
                     href={g.primaryHref}
@@ -252,11 +268,15 @@ export function SupabaseSidebarNav() {
                     <Icon className="h-7 w-7" />
                   </Link>
 
-                  <div className="absolute left-full top-0 z-50 pl-2">
+                  <div
+                    className="absolute left-full top-0 z-50 pl-2"
+                    onMouseEnter={() => openPanel(g.key)}
+                    onMouseLeave={() => scheduleClosePanel(g.key)}
+                  >
                     <div
                       className={[
                         "w-[200px] origin-left rounded-lg border border-[#3d3d3d] bg-[#2d2d2d] p-2 shadow-2xl shadow-black/40",
-                        "transition-all duration-200 ease-out",
+                        "transition-[opacity,transform] duration-200 ease-out",
                         isOpen ? "translate-x-0 opacity-100" : "translate-x-1 opacity-0 pointer-events-none",
                       ].join(" ")}
                     >
