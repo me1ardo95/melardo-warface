@@ -6,7 +6,7 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import "./globals.css";
-import { Header } from "./components/layout/Header";
+import { SupabaseSidebarNav } from "./components/layout/SupabaseSidebarNav";
 
 const displayPrimary = Bebas_Neue({
   variable: "--font-display-primary",
@@ -45,8 +45,10 @@ export default function RootLayout({
       <body
         className={`${displayPrimary.variable} ${displayAlt.variable} ${inter.variable} ${jetBrainsMono.variable} antialiased bg-gradient-to-br from-[#0A0C0F] to-[#1A1E24] text-white`}
       >
-        <Header />
-        <main className="mx-auto max-w-5xl px-4 pb-12 pt-6">{children}</main>
+        <SupabaseSidebarNav />
+        <div className="pl-16">
+          <main className="mx-auto max-w-5xl px-4 pb-12 pt-6">{children}</main>
+        </div>
       </body>
     </html>
   );
