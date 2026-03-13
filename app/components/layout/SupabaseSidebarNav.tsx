@@ -42,6 +42,7 @@ export function SupabaseSidebarNav() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [hasUser, setHasUser] = useState<boolean>(false);
   const [myTeamHref, setMyTeamHref] = useState<string>("/teams");
+  const [activeKey, setActiveKey] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -232,22 +233,33 @@ export function SupabaseSidebarNav() {
         <nav className="flex flex-col items-center gap-0.5 px-1.5">
           {visibleGroups.map((g) => {
             const Icon = g.icon;
+            const isOpen = activeKey === g.key;
             return (
               <div
                 key={g.key}
                 className="relative w-full"
               >
-                <div className="group relative">
+                <div
+                  className="relative"
+                  onMouseEnter={() => setActiveKey(g.key)}
+                  onMouseLeave={() => setActiveKey((prev) => (prev === g.key ? null : prev))}
+                >
                   <Link
                     href={g.primaryHref}
-                    className="flex h-9 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
+                    className="flex h-10 w-full items-center justify-center rounded-md text-white/70 hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#24B47E]"
                     aria-label={g.label}
                   >
                     <Icon className="h-5 w-5" />
                   </Link>
 
-                  <div className="pointer-events-none absolute left-full top-0">
-                    <div className="pointer-events-auto ml-1 w-[200px] origin-left translate-x-1 opacity-0 transition-all duration-150 ease-out group-hover:translate-x-0 group-hover:opacity-100 rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40">
+                  <div className="absolute left-full top-0 z-50 pl-2">
+                    <div
+                      className={[
+                        "w-[200px] origin-left rounded-lg border border-white/10 bg-[#0B0F14] p-2 shadow-2xl shadow-black/40",
+                        "transition-all duration-150 ease-out",
+                        isOpen ? "translate-x-0 opacity-100" : "translate-x-1 opacity-0 pointer-events-none",
+                      ].join(" ")}
+                    >
                       <div className="px-2 pb-1 pt-1 text-[11px] font-semibold tracking-wide text-white/60">
                         {g.label}
                       </div>
