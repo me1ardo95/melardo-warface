@@ -6,7 +6,8 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import "./globals.css";
-import { SupabaseSidebarNav } from "./components/layout/SupabaseSidebarNav";
+import { AppShell } from "./components/layout/AppShell";
+import { getCurrentProfile } from "./actions/data";
 
 const displayPrimary = Bebas_Neue({
   variable: "--font-display-primary",
@@ -35,20 +36,19 @@ export const metadata: Metadata = {
   description: "Соревнования, турниры, рейтинги, лиги. Только честная игра.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const profile = await getCurrentProfile().catch(() => null);
+
   return (
     <html lang="ru" className="min-h-full">
       <body
         className={`${displayPrimary.variable} ${displayAlt.variable} ${inter.variable} ${jetBrainsMono.variable} antialiased bg-gradient-to-br from-[#0A0C0F] to-[#1A1E24] text-white`}
       >
-        <SupabaseSidebarNav />
-        <div className="pl-16">
-          <main className="mx-auto max-w-5xl px-4 pb-12 pt-6">{children}</main>
-        </div>
+        <AppShell profile={profile}>{children}</AppShell>
       </body>
     </html>
   );

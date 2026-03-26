@@ -36,17 +36,17 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-2xl border border-[#2A2F3A] bg-gradient-to-br from-[#11141A] via-[#0D1014] to-[#07090C] p-8 shadow-2xl sm:p-12 md:p-16">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
-        <div className="relative">
+        <div className="relative space-y-3">
           <h1 className="text-3xl font-bold tracking-[0.2em] text-white sm:text-4xl md:text-5xl [font-family:var(--font-display-primary)]">
             MELARDO WARFACE
           </h1>
-          <p className="mt-2 text-base text-[#F97316] tracking-[0.12em] sm:text-lg [font-family:var(--font-display-alt)]">
+          <p className="text-base text-[#F97316] tracking-[0.12em] sm:text-lg [font-family:var(--font-display-alt)]">
             Киберспортивная платформа Warface
           </p>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#B0B8C5] sm:text-base">
+          <p className="max-w-xl text-sm leading-relaxed text-[#B0B8C5] sm:text-base">
             Создавай команды, участвуй в турнирах и поднимайся в рейтинге.
           </p>
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="pt-1 flex flex-wrap gap-4">
             <Link
               href="/teams/create"
               className="inline-flex items-center justify-center rounded-lg bg-[#F97316] px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-[#F97316]/25 transition-all hover:scale-105 hover:bg-[#FDBA74] hover:shadow-xl hover:shadow-[#F97316]/30"

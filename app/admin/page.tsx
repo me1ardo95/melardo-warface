@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile, getTeams, getTournaments } from "@/app/actions/data";
 import { AdminNav } from "./AdminNav";
@@ -16,51 +15,6 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen p-4 sm:p-6">
-      <nav className="mb-6 flex flex-wrap items-center gap-3 border-b border-neutral-200 pb-4 text-sm dark:border-neutral-800">
-        <Link
-          href="/"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Главная
-        </Link>
-        <Link
-          href="/profile"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Профиль
-        </Link>
-        <Link
-          href="/teams"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Команды
-        </Link>
-        <Link
-          href="/matches"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Вызовы
-        </Link>
-        <Link
-          href="/tournaments"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Турниры
-        </Link>
-        <Link
-          href="/rankings"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Рейтинги
-        </Link>
-        <Link
-          href="/admin"
-          className="font-medium text-neutral-900 dark:text-neutral-100"
-        >
-          Админ
-        </Link>
-      </nav>
-
       <AdminNav active="home" />
 
       <div className="mx-auto max-w-4xl space-y-4">

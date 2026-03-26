@@ -1,5 +1,17 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { CopyConnectCodeButton } from "./CopyConnectCodeButton";
+
+function normalizeTelegramBotUsername(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  const fromUrl = trimmed.match(/(?:https?:\/\/)?t\.me\/([A-Za-z0-9_]+)/i)?.[1];
+  const candidate = (fromUrl ?? trimmed).replace(/^@+/, "");
+  if (!/^[A-Za-z0-9_]+$/.test(candidate)) return null;
+  return candidate;
+}
 
 export default async function ConnectTelegramPage() {
   const supabase = await createClient();
@@ -28,7 +40,9 @@ export default async function ConnectTelegramPage() {
     );
   }
 
-  const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+  const botUsername = normalizeTelegramBotUsername(
+    process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME
+  );
   const connectCode = user.id;
   const botLink = botUsername
     ? `https://t.me/${botUsername}?start=${encodeURIComponent(connectCode)}`
@@ -36,18 +50,6 @@ export default async function ConnectTelegramPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
-        <Link
-          href="/"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Главная
-        </Link>
-        <span className="font-medium text-neutral-900 dark:text-neutral-100">
-          Подключение Telegram
-        </span>
-      </nav>
-
       <div className="mx-auto max-w-xl">
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
@@ -95,22 +97,7 @@ export default async function ConnectTelegramPage() {
                 .
               </p>
             )}
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(connectCode);
-                  // eslint-disable-next-line no-alert
-                  alert("Код подключения скопирован в буфер обмена");
-                } catch {
-                  // eslint-disable-next-line no-alert
-                  alert("Не удалось скопировать код. Скопируйте вручную.");
-                }
-              }}
-              className="inline-flex flex-1 items-center justify-center rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800"
-            >
-              Скопировать код подключения
-            </button>
+            <CopyConnectCodeButton connectCode={connectCode} />
           </div>
 
           <p className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">

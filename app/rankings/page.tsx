@@ -37,26 +37,6 @@ export default async function RankingsPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen p-6">
-      <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
-        <Link href="/" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-          Главная
-        </Link>
-        <Link href="/profile" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-          Профиль
-        </Link>
-        <Link href="/teams" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-          Команды
-        </Link>
-        <Link href="/matches" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-          Вызовы
-        </Link>
-        <Link href="/tournaments" className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100">
-          Турниры
-        </Link>
-        <Link href="/rankings" className="font-medium text-neutral-900 dark:text-neutral-100">
-          Рейтинги
-        </Link>
-      </nav>
       <div className="mx-auto max-w-4xl">
         <h1 className="text-xl font-semibold">Рейтинги</h1>
 

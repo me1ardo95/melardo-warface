@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
-import Link from "next/link";
+import ReferralCopyButton from "./ReferralCopyButton";
 
 function buildReferralLink(code: string | null) {
   if (!code) return "";
@@ -45,18 +45,6 @@ export default async function ReferralPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <nav className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4 dark:border-neutral-800">
-        <Link
-          href="/"
-          className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-        >
-          Главная
-        </Link>
-        <span className="font-medium text-neutral-900 dark:text-neutral-100">
-          Рефералы
-        </span>
-      </nav>
-
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
@@ -81,17 +69,7 @@ export default async function ReferralPage() {
                   value={referralLink || "Код ещё не сгенерирован"}
                   className="flex-1 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-xs text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                 />
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (!referralLink) return;
-                    await navigator.clipboard.writeText(referralLink);
-                    alert("Ссылка скопирована в буфер обмена");
-                  }}
-                  className="whitespace-nowrap rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
-                >
-                  Скопировать
-                </button>
+                <ReferralCopyButton referralLink={referralLink} />
               </div>
             </div>
           </div>
