@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         : null;
 
     const rankValue =
-      rank !== undefined && typeof rank === "number" && Number.isInteger(rank) && rank >= 1 && rank <= 100
+      rank !== undefined && typeof rank === "number" && Number.isInteger(rank) && rank >= 1 && rank <= 1000
         ? rank
         : undefined;
 

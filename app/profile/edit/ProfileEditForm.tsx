@@ -114,12 +114,12 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
           id="rank"
           type="number"
           min={1}
-          max={100}
+          max={1000}
           className={inputClass}
           {...register("rank", {
             valueAsNumber: true,
-            min: { value: 1, message: "Ранг от 1 до 100" },
-            max: { value: 100, message: "Ранг от 1 до 100" },
+            min: { value: 1, message: "Ранг от 1 до 1000" },
+            max: { value: 1000, message: "Ранг от 1 до 1000" },
           })}
         />
         <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
