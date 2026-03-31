@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import {
   WARFACE_NICK_REGEX,
   WARFACE_NICK_MIN,
@@ -10,6 +10,9 @@ import {
   WARFACE_NICK_FORMAT_ERROR,
   WARFACE_NICK_LENGTH_ERROR,
 } from "@/lib/validation";
+import { createClient } from "@/lib/supabase/client";
+
+const AVATAR_BUCKET = process.env.NEXT_PUBLIC_AVATAR_BUCKET ?? "avatars";
 
 type FormData = {
   warface_nick: string;
@@ -25,6 +28,7 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const avatarFileRef = useRef<HTMLInputElement>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   const {
     register,
@@ -40,7 +44,38 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
   const onSubmit = async (data: FormData) => {
     setSubmitError(null);
     try {
-      const avatarUrl = ""; // Заглушка: загрузка аватара будет добавлена позже
+      let avatarUrl: string | undefined;
+      const file = avatarFileRef.current?.files?.[0];
+
+      if (file) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setSubmitError("Необходима авторизация.");
+          return;
+        }
+
+        // Публичная ссылка для рендера на странице профиля и в сайдбаре.
+        const filePath = `avatars/${user.id}/${Date.now()}-${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from(AVATAR_BUCKET)
+          .upload(filePath, file, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (uploadError) {
+          setSubmitError(
+            `Ошибка загрузки аватара: ${uploadError.message || "неизвестная"}.`
+          );
+          return;
+        }
+
+        avatarUrl = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(filePath).data.publicUrl;
+      }
+
       const res = await fetch("/api/profile/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -56,7 +91,8 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
         setSubmitError(json?.error ?? "Не удалось сохранить изменения");
         return;
       }
-      router.push("/profile");
+      router.replace("/profile");
+      router.refresh();
     } catch {
       setSubmitError("Ошибка сети. Попробуйте позже.");
     }
@@ -142,7 +178,7 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
           className="block w-full text-sm text-neutral-500 file:mr-4 file:rounded-md file:border-0 file:bg-neutral-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-neutral-700 hover:file:bg-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-200 dark:hover:file:bg-neutral-600"
         />
         <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-          Загрузка аватара будет добавлена позже. Выбор файла пока не сохраняется.
+          Аватар будет сохранён после загрузки файла.
         </p>
       </div>
       {submitError && (

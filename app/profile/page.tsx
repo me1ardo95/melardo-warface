@@ -110,6 +110,12 @@ export default async function ProfilePage() {
                 {profile.warface_nick ?? "не указан"}
               </span>
             </p>
+            <p className="text-sm text-[#B0B8C5]">
+              Ранг в Warface:{" "}
+              <span className="font-semibold text-white">
+                {profile.rank ?? "не указан"}
+              </span>
+            </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <Link href="/profile/edit" className="btn-primary text-xs w-full sm:w-auto text-center">
                 Редактировать профиль

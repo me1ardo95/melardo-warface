@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { validateWarfaceNick, WARFACE_NICK_TAKEN_ERROR } from "@/lib/validation";
 
@@ -53,21 +54,27 @@ export async function POST(request: Request) {
     }
 
     const warfaceNickValue = warfaceNickTrimmed;
-    const avatarUrlValue =
-      avatar_url !== undefined && typeof avatar_url === "string" && avatar_url.trim()
-        ? avatar_url.trim()
-        : null;
-
     const rankValue =
-      rank !== undefined && typeof rank === "number" && Number.isInteger(rank) && rank >= 1 && rank <= 1000
+      rank !== undefined &&
+      typeof rank === "number" &&
+      Number.isInteger(rank) &&
+      rank >= 1 &&
+      rank <= 1000
         ? rank
         : undefined;
 
     const updateData: Record<string, unknown> = {
       display_name: warfaceNickValue,
       warface_nick: warfaceNickValue,
-      avatar_url: avatarUrlValue,
     };
+
+    // Не трогаем `avatar_url`, если на клиенте поле не было передано.
+    // Это важно, чтобы не затирать уже сохранённый аватар пустым значением.
+    if (avatar_url !== undefined) {
+      updateData.avatar_url =
+        typeof avatar_url === "string" && avatar_url.trim() ? avatar_url.trim() : null;
+    }
+
     if (rankValue !== undefined) updateData.rank = rankValue;
 
     const { error } = await supabase
@@ -81,6 +88,10 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Убеждаемся, что /profile и шапка/сидебар получат свежие данные.
+    revalidatePath("/profile");
+    revalidatePath("/", "layout");
 
     return NextResponse.json({ success: true });
   } catch (err) {
