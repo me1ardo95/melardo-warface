@@ -72,8 +72,7 @@ export default async function ProfilePage() {
       ? (membershipRes.data as { team_id: string }).team_id
       : null;
 
-  const displayName =
-    profile.warface_nick || profile.display_name || profile.email || "Игрок";
+  const displayName = profile.display_name || profile.warface_nick || profile.email || "Игрок";
   const initial = displayName.charAt(0).toUpperCase();
 
   const isFreeAgent = !profile.points || profile.points <= 0;
@@ -104,6 +103,12 @@ export default async function ProfilePage() {
                 {profile.warface_nick ? "Боевой профиль" : "Профиль игрока"}
               </span>
             </div>
+            <p className="text-sm text-[#B0B8C5]">
+              Имя:{" "}
+              <span className="font-semibold text-white">
+                {profile.display_name ?? "не указано"}
+              </span>
+            </p>
             <p className="text-sm text-[#B0B8C5]">
               Ник в Warface:{" "}
               <span className="font-semibold text-white">

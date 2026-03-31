@@ -17,7 +17,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { warface_nick, avatar_url, rank } = (body ?? {}) as {
+    const { display_name, warface_nick, avatar_url, rank } = (body ?? {}) as {
+      display_name?: string;
       warface_nick?: string;
       avatar_url?: string;
       rank?: number;
@@ -54,6 +55,10 @@ export async function POST(request: Request) {
     }
 
     const warfaceNickValue = warfaceNickTrimmed;
+    const displayNameValue =
+      typeof display_name === "string" && display_name.trim()
+        ? display_name.trim()
+        : null;
     const rankValue =
       rank !== undefined &&
       typeof rank === "number" &&
@@ -64,9 +69,12 @@ export async function POST(request: Request) {
         : undefined;
 
     const updateData: Record<string, unknown> = {
-      display_name: warfaceNickValue,
       warface_nick: warfaceNickValue,
     };
+
+    if (displayNameValue !== null) {
+      updateData.display_name = displayNameValue;
+    }
 
     // Не трогаем `avatar_url`, если на клиенте поле не было передано.
     // Это важно, чтобы не затирать уже сохранённый аватар пустым значением.

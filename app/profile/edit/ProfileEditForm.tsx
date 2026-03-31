@@ -15,16 +15,22 @@ import { createClient } from "@/lib/supabase/client";
 const AVATAR_BUCKET = process.env.NEXT_PUBLIC_AVATAR_BUCKET ?? "avatars";
 
 type FormData = {
+  display_name: string;
   warface_nick: string;
   rank: number;
 };
 
 type Props = {
+  displayName: string | null;
   warfaceNick: string | null;
   rank: number | null;
 };
 
-export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Props) {
+export default function ProfileEditForm({
+  displayName,
+  warfaceNick,
+  rank: initialRank,
+}: Props) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -36,6 +42,7 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
+      display_name: displayName ?? "",
       warface_nick: warfaceNick ?? "",
       rank: initialRank ?? 1,
     },
@@ -80,6 +87,7 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          display_name: data.display_name.trim(),
           warface_nick: data.warface_nick.trim(),
           avatar_url: avatarUrl || undefined,
           rank: data.rank,
@@ -104,6 +112,24 @@ export default function ProfileEditForm({ warfaceNick, rank: initialRank }: Prop
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+      <div>
+        <label
+          htmlFor="display_name"
+          className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+        >
+          Имя
+        </label>
+        <input
+          id="display_name"
+          type="text"
+          placeholder="Как вас называть на платформе"
+          className={inputClass}
+          {...register("display_name", {
+            required: "Укажите имя",
+            minLength: { value: 2, message: "Минимум 2 символа" },
+          })}
+        />
+      </div>
       <div>
         <label
           htmlFor="warface_nick"

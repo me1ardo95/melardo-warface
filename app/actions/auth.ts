@@ -26,7 +26,12 @@ export async function signUp(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const displayNameRaw = formData.get("displayName") as string | null;
   const warfaceNickRaw = formData.get("warfaceNick") as string | null;
+  const displayName =
+    typeof displayNameRaw === "string" && displayNameRaw.trim()
+      ? displayNameRaw.trim()
+      : null;
   const warfaceNick = typeof warfaceNickRaw === "string" ? warfaceNickRaw.trim() : "";
 
   if (!warfaceNick) {
@@ -49,7 +54,7 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      data: { display_name: warfaceNick },
+      data: displayName ? { display_name: displayName } : undefined,
     },
   });
 
@@ -82,7 +87,7 @@ export async function signUp(formData: FormData) {
       .from("profiles")
       .update({
         warface_nick: warfaceNick,
-        display_name: warfaceNick,
+        ...(displayName ? { display_name: displayName } : {}),
         ...(inviteCode ? { invite_code: inviteCode } : {}),
       })
       .eq("id", signUpData.user.id);
