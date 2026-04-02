@@ -52,6 +52,16 @@ export function AppShell({ profile, children }: AppShellProps) {
     );
   }
 
+  // Public player profile pages should not use the legacy left sidebar shell.
+  if (pathname?.startsWith("/players/")) {
+    return (
+      <>
+        <LandingHeader profile={profile} />
+        <main className="mx-auto max-w-5xl px-4 pb-12 pt-6">{children}</main>
+      </>
+    );
+  }
+
   // Public pages (or internal routes while unauthenticated):
   // Keep the current navigation model intact.
   return (

@@ -111,8 +111,10 @@ export default async function PlayerPage({ params }: Props) {
 
   if (!profile) notFound();
 
-  const displayName =
-    profile.warface_nick || profile.display_name || profile.email || "Игрок";
+  // For public views we keep the same mapping as rankings:
+  // `warface_nick` might be missing, so fallback to `display_name`.
+  const warfaceNick = profile.warface_nick || profile.display_name || "не указан";
+  const displayName = warfaceNick === "не указан" ? profile.email || "Игрок" : warfaceNick;
   const initial = displayName.charAt(0).toUpperCase();
 
   const isCurrentUser = currentProfile?.id === profile.id;
@@ -185,7 +187,7 @@ export default async function PlayerPage({ params }: Props) {
               <span>
                 Ник в Warface:{" "}
                 <span className="font-semibold text-white">
-                  {profile.warface_nick ?? "не указан"}
+                  {warfaceNick}
                 </span>
               </span>
               <span>
