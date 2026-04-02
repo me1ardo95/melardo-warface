@@ -236,7 +236,7 @@ export function SupabaseSidebarNav() {
             <img
               src="/branding/logo.png"
               alt="MELARDO WARFACE"
-              className="mx-auto h-10 w-full max-w-[48px] object-contain"
+              className="mx-auto h-11 w-full max-w-[52px] object-contain"
             />
           </div>
         </Link>
