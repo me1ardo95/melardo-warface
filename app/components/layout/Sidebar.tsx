@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { Profile } from "@/lib/types";
 import { signOut } from "@/app/actions/auth";
+import { MelardoLogo } from "@/app/components/branding/MelardoLogo";
 import {
   adminDashboardNav,
   DashboardNavItem,
@@ -106,9 +107,7 @@ export function Sidebar({
 
   const Brand = (
     <div className="flex min-w-0 flex-1 items-center justify-center py-2">
-      <img
-        src="/branding/logo.png"
-        alt="MELARDO WARFACE"
+      <MelardoLogo
         className={[
           "object-contain",
           collapsed ? "h-10 w-10" : "h-10 w-full max-w-[200px] mx-auto",
@@ -273,11 +272,7 @@ export function Sidebar({
             <div className="h-14 px-3 pt-1">
               <div className="flex h-full items-center justify-between">
                 <div className="flex min-w-0 flex-1 items-center justify-center py-2">
-                  <img
-                    src="/branding/logo.png"
-                    alt="MELARDO WARFACE"
-                    className="h-10 w-full max-w-[220px] object-contain mx-auto"
-                  />
+                  <MelardoLogo className="h-10 w-full max-w-[220px] object-contain mx-auto" />
                 </div>
                 <button
                   type="button"
