@@ -37,6 +37,11 @@ export function AppShell({ profile, children }: AppShellProps) {
     );
   }
 
+  // Auth pages must be standalone (no dashboard sidebar/menu).
+  if (pathname === "/login" || pathname === "/register") {
+    return <>{children}</>;
+  }
+
   // Public pages that should stay in base header layout: no dashboard sidebar shell.
   if (pathname === "/" || pathname === "/rules") {
     return (
