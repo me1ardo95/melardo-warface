@@ -74,14 +74,6 @@ export default async function ProfilePage() {
 
   const displayName = profile.display_name || profile.warface_nick || profile.email || "Игрок";
   const initial = displayName.charAt(0).toUpperCase();
-  const inviteCode =
-    typeof profile.invite_code === "string" && profile.invite_code.trim()
-      ? profile.invite_code.trim()
-      : null;
-  const referralLink = inviteCode
-    ? `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/ref/code/${encodeURIComponent(inviteCode)}`
-    : null;
-
   const isFreeAgent = !profile.points || profile.points <= 0;
 
   return (
@@ -335,22 +327,6 @@ export default async function ProfilePage() {
         >
           💳 Поддержать как игрок
         </a>
-      </div>
-
-      <div className="card-surface p-6">
-        <h2 className="text-sm tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">
-          Реферальная ссылка
-        </h2>
-        <p className="mt-2 text-sm text-[#B0B8C5]">
-          Поделитесь ссылкой с друзьями. Когда администратор подтвердит реферальную регистрацию, вы получите дополнительные очки.
-        </p>
-        <div className="mt-3 flex flex-col gap-2 text-sm">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded bg-[#111827] px-3 py-2 font-mono text-xs text-[#E5E7EB]">
-              {referralLink ?? "Код ещё не сгенерирован"}
-            </span>
-          </div>
-        </div>
       </div>
 
       <ProfileInvitations invitations={invitations} />

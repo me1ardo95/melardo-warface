@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
 import ReferralCopyButton from "./ReferralCopyButton";
+import { revalidatePath } from "next/cache";
 
 function buildReferralLink(code: string | null) {
   if (!code) return "";
@@ -10,6 +11,57 @@ function buildReferralLink(code: string | null) {
 export default async function ReferralPage() {
   const supabase = await createClient();
   const profile = await getCurrentProfile();
+
+  async function generateInviteCodeAction() {
+    "use server";
+
+    const supabase = await createClient();
+    const profile = await getCurrentProfile();
+    if (!profile) return;
+
+    const { data: current } = await supabase
+      .from("profiles")
+      .select("invite_code")
+      .eq("id", profile.id)
+      .single();
+
+    const existingCode =
+      typeof current?.invite_code === "string" ? current.invite_code.trim() : "";
+    if (existingCode) {
+      revalidatePath("/referral");
+      return;
+    }
+
+    let inviteCode: string | null = null;
+    for (let i = 0; i < 8; i++) {
+      const candidate = Array.from({ length: 8 })
+        .map(() => {
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join("");
+
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("invite_code", candidate)
+        .maybeSingle();
+
+      if (!existing) {
+        inviteCode = candidate;
+        break;
+      }
+    }
+
+    if (inviteCode) {
+      await supabase
+        .from("profiles")
+        .update({ invite_code: inviteCode })
+        .eq("id", profile.id);
+    }
+
+    revalidatePath("/referral");
+  }
 
   if (!profile) {
     return (
@@ -60,6 +112,15 @@ export default async function ReferralPage() {
               <div className="mt-1 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 font-mono text-lg font-semibold tracking-[0.2em] dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                 {inviteCode ?? "—"}
               </div>
+              <form action={generateInviteCodeAction} className="mt-2">
+                <button
+                  type="submit"
+                  disabled={!!inviteCode}
+                  className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Сгенерировать пригласительный код
+                </button>
+              </form>
             </div>
             <div>
               <div className="text-neutral-500 dark:text-neutral-400">Ссылка для приглашения</div>
