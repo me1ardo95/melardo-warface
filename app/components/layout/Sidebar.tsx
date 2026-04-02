@@ -105,19 +105,15 @@ export function Sidebar({
   const avatarInitial = getDisplayName(profile).charAt(0).toUpperCase();
 
   const Brand = (
-    <div className="flex items-center gap-3">
+    <div className="flex min-w-0 flex-1 items-center">
       <img
         src="/branding/logo.png"
         alt="MELARDO WARFACE"
-        className="h-9 w-9 object-contain"
+        className={[
+          "object-contain",
+          collapsed ? "h-9 w-9" : "h-8 w-auto max-w-[160px]",
+        ].join(" ")}
       />
-      {!collapsed && (
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold tracking-[0.14em]">
-            MELARDO WARFACE
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -276,18 +272,12 @@ export function Sidebar({
           <div className="h-full">
             <div className="h-14 px-3 pt-1">
               <div className="flex h-full items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center">
                   <img
                     src="/branding/logo.png"
                     alt="MELARDO WARFACE"
-                    className="h-9 w-9 object-contain"
+                    className="h-9 w-auto max-w-[180px] object-contain"
                   />
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold tracking-[0.14em]">
-                      MELARDO WARFACE
-                    </div>
-                    <div className="truncate text-xs text-[#B0B8C5]">Меню</div>
-                  </div>
                 </div>
                 <button
                   type="button"
