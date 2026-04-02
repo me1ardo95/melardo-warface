@@ -116,7 +116,6 @@ export function Sidebar({
           <div className="truncate text-sm font-semibold tracking-[0.14em]">
             MELARDO WARFACE
           </div>
-          <div className="truncate text-xs text-[#B0B8C5]">Dashboard</div>
         </div>
       )}
     </div>
