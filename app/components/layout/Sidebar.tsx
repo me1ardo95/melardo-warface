@@ -107,7 +107,7 @@ export function Sidebar({
   const Brand = (
     <div className="flex items-center gap-3">
       <img
-        src="/melardo-warface-logo.png"
+        src="/branding/logo.png"
         alt="MELARDO WARFACE"
         className="h-9 w-9 object-contain"
       />
@@ -279,7 +279,7 @@ export function Sidebar({
               <div className="flex h-full items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
-                    src="/melardo-warface-logo.png"
+                    src="/branding/logo.png"
                     alt="MELARDO WARFACE"
                     className="h-9 w-9 object-contain"
                   />

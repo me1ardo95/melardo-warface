@@ -234,7 +234,7 @@ export function SupabaseSidebarNav() {
         >
           <div className="flex flex-col items-center justify-center leading-none">
             <img
-              src="/melardo-warface-logo.png"
+              src="/branding/logo.png"
               alt="MELARDO WARFACE"
               className="h-10 w-10 object-contain"
             />
