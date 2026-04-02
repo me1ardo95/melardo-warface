@@ -74,6 +74,13 @@ export default async function ProfilePage() {
 
   const displayName = profile.display_name || profile.warface_nick || profile.email || "Игрок";
   const initial = displayName.charAt(0).toUpperCase();
+  const inviteCode =
+    typeof profile.invite_code === "string" && profile.invite_code.trim()
+      ? profile.invite_code.trim()
+      : null;
+  const referralLink = inviteCode
+    ? `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/ref/code/${encodeURIComponent(inviteCode)}`
+    : null;
 
   const isFreeAgent = !profile.points || profile.points <= 0;
 
@@ -340,9 +347,7 @@ export default async function ProfilePage() {
         <div className="mt-3 flex flex-col gap-2 text-sm">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded bg-[#111827] px-3 py-2 font-mono text-xs text-[#E5E7EB]">
-              {`${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/ref/code/${encodeURIComponent(
-                profile.warface_nick ?? profile.display_name ?? profile.email ?? profile.id
-              )}`}
+              {referralLink ?? "Код ещё не сгенерирован"}
             </span>
           </div>
         </div>
