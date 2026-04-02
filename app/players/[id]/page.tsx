@@ -111,20 +111,21 @@ export default async function PlayerPage({ params }: Props) {
 
   if (!profile) notFound();
 
-  // For public views we keep the same mapping as rankings:
-  // `warface_nick` might be missing, so fallback to `display_name`.
-  const warfaceNick = profile.warface_nick || profile.display_name || "не указан";
-  const displayName = warfaceNick === "не указан" ? profile.email || "Игрок" : warfaceNick;
+  // Keep the same field mapping as the real profile page (`app/profile/page.tsx`).
+  // - `display_name` has priority for the title
+  // - `warface_nick` is shown as "не указан" when missing (no fallback to display_name)
+  const displayName =
+    profile.display_name || profile.warface_nick || profile.email || "Игрок";
+  const warfaceNick = profile.warface_nick ?? "не указан";
   const initial = displayName.charAt(0).toUpperCase();
 
   const isCurrentUser = currentProfile?.id === profile.id;
 
-  const roleBadge = team
-    ? isCurrentUser
-      ? "Боец отряда"
-      : "Игрок команды"
-    : "Свободный агент";
+  // Same badge logic as the real profile page:
+  // when `warface_nick` exists => "Боевой профиль", otherwise => "Профиль игрока".
+  const roleBadge = profile.warface_nick ? "Боевой профиль" : "Профиль игрока";
 
+  // Keep existing color logic to avoid redesign.
   const roleColor = team ? "#E63946" : "#6B7280";
 
   const lastFive = matches.slice(0, 5);
@@ -185,9 +186,21 @@ export default async function PlayerPage({ params }: Props) {
             )}
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide text-[#9CA3AF]">
               <span>
+                Имя:{" "}
+                <span className="font-semibold text-white">
+                  {profile.display_name ?? "не указано"}
+                </span>
+              </span>
+              <span>
                 Ник в Warface:{" "}
                 <span className="font-semibold text-white">
                   {warfaceNick}
+                </span>
+              </span>
+              <span>
+                Ранг в Warface:{" "}
+                <span className="font-semibold text-white">
+                  {profile.rank ?? "не указан"}
                 </span>
               </span>
               <span>
