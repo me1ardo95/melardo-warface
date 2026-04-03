@@ -258,7 +258,7 @@ export default async function ProfilePage() {
           </div>
           <p className="mt-3 text-sm text-[#B0B8C5]">
             Здесь появятся ваши турнирные победы, призовые места и участие в
-            финалах MELARDO WARFACE.
+            финалах MELARDO.
           </p>
         </div>
 
@@ -303,7 +303,7 @@ export default async function ProfilePage() {
         <p className="mt-3 text-sm text-[#B0B8C5]">
           Донат на ваш личный счёт. После подтверждения администратором очки
           будут начислены прямо в ваш профиль и повлияют на ваш рейтинг в лигах
-          MELARDO WARFACE.
+          MELARDO.
         </p>
         <div className="mt-4 rounded-xl border border-[#2A2F3A] bg-[#050816] p-4 text-sm text-[#E5E7EB]">
           <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">

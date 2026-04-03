@@ -39,7 +39,7 @@ export default async function AdminPlayersPage() {
             Игроки
           </h1>
           <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-            Список игроков платформы MELARDO WARFACE с быстрым переходом в
+            Список игроков платформы MELARDO с быстрым переходом в
             админ‑просмотр профиля.
           </p>
         </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Правила платформы | MELARDO WARFACE",
+  title: "Правила платформы | MELARDO",
   description:
-    "Полные правила киберспортивной платформы MELARDO WARFACE: регистрация, команды, матчи, турниры, рейтинги, жалобы и наказания.",
+    "Полные правила киберспортивной платформы MELARDO: регистрация, команды, матчи, турниры, рейтинги, жалобы и наказания.",
 };
 
 const cardClass = "card-surface p-6 sm:p-8";
@@ -19,7 +19,7 @@ export default function RulesPage() {
     <div className="space-y-8 pb-12">
       <div className="text-center">
         <h1 className="text-2xl sm:text-3xl tracking-[0.18em] text-white [font-family:var(--font-display-primary)]">
-          ПРАВИЛА ПЛАТФОРМЫ MELARDO WARFACE
+          ПРАВИЛА ПЛАТФОРМЫ MELARDO
         </h1>
         <p className="mt-2 text-sm text-[#B0B8C5]">
           Официальный регламент. Обязательны к ознакомлению для всех участников.
@@ -32,7 +32,7 @@ export default function RulesPage() {
 
         <h3 className={subsectionTitleClass}>1.1. О платформе</h3>
         <p className={bodyClass}>
-          MELARDO WARFACE — киберспортивная платформа для организации и учёта
+          MELARDO — киберспортивная платформа для организации и учёта
           соревнований по игре Warface. Платформа предоставляет инструменты для
           создания команд, проведения вызовов (обычных матчей), турниров,
           ведения рейтингов и сезонной лиги. Цель — честная конкурентная среда
@@ -451,7 +451,7 @@ export default function RulesPage() {
         <h3 className={subsectionTitleClass}>7.2. Запрет на оскорбления</h3>
         <p className={bodyClass}>
           Запрещены оскорбления, угрозы, травля, дискриминация по любым признакам
-          в чатах платформы, в игре в рамках матчей MELARDO WARFACE и в
+          в чатах платформы, в игре в рамках матчей MELARDO и в
           официальных каналах (Telegram и т.д.). Нарушение влечёт предупреждение,
           временный или постоянный бан в зависимости от тяжести.
         </p>
@@ -722,7 +722,7 @@ export default function RulesPage() {
           К отношениям между пользователями и платформой применяется
           законодательство Российской Федерации. Вопросы, не урегулированные
           правилами, разрешаются по усмотрению администрации с учётом принципов
-          честной игры и интересов сообщества MELARDO WARFACE.
+          честной игры и интересов сообщества MELARDO.
         </p>
       </section>
 

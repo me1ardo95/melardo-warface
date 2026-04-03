@@ -60,7 +60,7 @@ export default async function TournamentRequestPage() {
           </h1>
           <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
             Заполните форму, чтобы предложить новый турнир администрации
-            MELARDO WARFACE.
+            MELARDO.
           </p>
           <TournamentRequestForm />
         </div>

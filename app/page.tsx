@@ -38,7 +38,7 @@ export default async function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(249,115,22,0.15),transparent)]" />
         <div className="relative space-y-3">
           <h1 className="text-3xl font-bold tracking-[0.2em] text-white sm:text-4xl md:text-5xl [font-family:var(--font-display-primary)]">
-            MELARDO WARFACE
+            MELARDO
           </h1>
           <p className="text-base text-[#F97316] tracking-[0.12em] sm:text-lg [font-family:var(--font-display-alt)]">
             Киберспортивная платформа Warface

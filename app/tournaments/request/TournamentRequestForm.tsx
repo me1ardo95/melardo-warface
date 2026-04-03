@@ -116,7 +116,7 @@ export default function TournamentRequestForm() {
           type="text"
           required
           className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
-          placeholder="Например: MELARDO WARFACE Cup"
+          placeholder="Например: MELARDO Cup"
         />
       </div>
 

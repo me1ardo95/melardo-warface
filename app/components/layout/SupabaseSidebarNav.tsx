@@ -227,14 +227,15 @@ export function SupabaseSidebarNav() {
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-dvh w-16 flex-col bg-[#2d2d2d] text-[#ccc]">
-      <div className="h-20 shrink-0 border-b border-[#3d3d3d]">
+      <div className="h-24 shrink-0 border-b border-[#3d3d3d] px-1.5">
         <Link
           href="/"
           className="flex h-full w-full items-center justify-center"
-          aria-label="MELARDO WARFACE"
+          aria-label="MELARDO"
+          title="MELARDO"
         >
-          <div className="flex flex-col items-center justify-center leading-none">
-            <MelardoLogo className="mx-auto h-11 w-full max-w-[52px] object-contain" />
+          <div className="flex w-full min-w-0 flex-col items-center justify-center px-0.5 leading-none">
+            <MelardoLogo className="h-[52px] w-full min-w-0 max-w-full object-contain object-center" />
           </div>
         </Link>
       </div>

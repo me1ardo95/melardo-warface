@@ -21,7 +21,7 @@ const report: {
   screenshots: [],
 };
 
-test.describe("MELARDO WARFACE — полное E2E тестирование", () => {
+test.describe("MELARDO — полное E2E тестирование", () => {
   test.beforeEach(async ({ page }) => {
     // Слушаем консоль
     page.on("console", (msg) => {
@@ -48,7 +48,7 @@ test.describe("MELARDO WARFACE — полное E2E тестирование", (
     const ok = status >= 200 && status < 400;
     report.pagesChecked.push({ url: "/", ok, status: status || undefined });
     expect(ok, `Главная должна загружаться. Status: ${status}`).toBe(true);
-    await expect(page.locator("text=MELARDO WARFACE").first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("text=MELARDO").first()).toBeVisible({ timeout: 10000 });
     await page.screenshot({ path: "test-results/screenshot-home.png", fullPage: true }).catch(() => {});
     report.screenshots.push("screenshot-home.png");
   });
@@ -255,7 +255,7 @@ test.describe("MELARDO WARFACE — полное E2E тестирование", (
     }
 
     const reportText = `
-========== ОТЧЁТ E2E ТЕСТИРОВАНИЯ MELARDO WARFACE ==========
+========== ОТЧЁТ E2E ТЕСТИРОВАНИЯ MELARDO ==========
 
 Страницы:
 ${report.pagesChecked.map((p) => `  ${p.ok ? "✓" : "✗"} ${p.url} ${p.status ? `(status: ${p.status})` : ""}`).join("\n")}

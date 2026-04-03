@@ -32,7 +32,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MELARDO WARFACE | Киберспортивная платформа",
+  title: "MELARDO | Киберспортивная платформа",
   description: "Соревнования, турниры, рейтинги, лиги. Только честная игра.",
 };
 

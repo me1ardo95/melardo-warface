@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MelardoLogo } from "@/app/components/branding/MelardoLogo";
 import type { Profile } from "@/lib/types";
 
 type LandingHeaderProps = {
@@ -15,9 +16,11 @@ export function LandingHeader({ profile }: LandingHeaderProps) {
       <nav className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
-          className="shrink-0 font-bold tracking-[0.16em] text-sm text-white hover:text-[#F97316] [font-family:var(--font-display-primary)]"
+          className="shrink-0 opacity-95 transition-opacity hover:opacity-100"
+          aria-label="MELARDO"
+          title="MELARDO"
         >
-          MELARDO WARFACE
+          <MelardoLogo className="h-9 w-auto max-w-[min(200px,42vw)] object-contain object-left" />
         </Link>
 
         <div className="hidden flex-1 items-center justify-center gap-6 md:flex">

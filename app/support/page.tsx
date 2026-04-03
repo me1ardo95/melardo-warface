@@ -106,7 +106,7 @@ export default function SupportPage() {
       {/* 1. ЗАГОЛОВОК */}
       <div className="text-center">
         <h1 className="text-2xl sm:text-3xl tracking-[0.18em] text-white [font-family:var(--font-display-primary)]">
-          ПОДДЕРЖКА MELARDO WARFACE
+          ПОДДЕРЖКА MELARDO
         </h1>
         <p className="mt-2 text-sm text-[#B0B8C5]">
           Если у вас возникли проблемы, вопросы или предложения — свяжитесь с нами.

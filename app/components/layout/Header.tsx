@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { signOut } from "@/app/actions/auth";
+import { MelardoLogo } from "@/app/components/branding/MelardoLogo";
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -62,10 +63,12 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="font-bold tracking-[0.18em] text-sm text-white hover:text-[#F97316] [font-family:var(--font-display-primary)]"
+            className="shrink-0 opacity-95 transition-opacity hover:opacity-100"
+            aria-label="MELARDO"
+            title="MELARDO"
             onClick={closeMobileMenu}
           >
-            MELARDO WARFACE
+            <MelardoLogo className="h-9 w-auto max-w-[min(200px,50vw)] object-contain object-left" />
           </Link>
           {user && (
             <div className="hidden items-center gap-4 md:flex">

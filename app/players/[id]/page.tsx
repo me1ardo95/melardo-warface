@@ -167,7 +167,7 @@ export default async function PlayerPage({ params }: Props) {
               </span>
             </div>
             <p className="text-sm text-[#B0B8C5]">
-              Профиль игрока MELARDO WARFACE
+              Профиль игрока MELARDO
             </p>
             {team ? (
               <p className="mt-1 text-sm text-[#E5E7EB]">

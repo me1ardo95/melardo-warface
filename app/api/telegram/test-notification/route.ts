@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const text = "Тестовое уведомление MELARDO WARFACE. Telegram-уведомления работают.";
+    const text = "Тестовое уведомление MELARDO. Telegram-уведомления работают.";
     const ok = await sendTelegramMessage(telegramId, text);
 
     if (!ok) {

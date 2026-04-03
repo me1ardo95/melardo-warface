@@ -13,7 +13,7 @@ import {
   isNavItemVisible,
   userDashboardNav,
 } from "./dashboardNavConfig";
-import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Wrench } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Wrench, X } from "lucide-react";
 
 type SidebarProps = {
   profile: Profile;
@@ -106,11 +106,13 @@ export function Sidebar({
   const avatarInitial = getDisplayName(profile).charAt(0).toUpperCase();
 
   const Brand = (
-    <div className="flex min-w-0 flex-1 items-center justify-center py-2">
+    <div className="flex w-full min-w-0 items-center justify-center px-2 py-2">
       <MelardoLogo
         className={[
-          "object-contain",
-          collapsed ? "h-10 w-10" : "h-10 w-full max-w-[200px] mx-auto",
+          "object-contain object-center",
+          collapsed
+            ? "h-10 w-10 max-w-full"
+            : "h-[52px] w-full max-w-[min(212px,calc(100%-8px))]",
         ].join(" ")}
       />
     </div>
@@ -118,16 +120,8 @@ export function Sidebar({
 
   const SidebarCore = (
     <>
-      <div className="flex h-14 items-center justify-between border-b border-[#2A2F3A] px-3">
+      <div className="flex h-16 shrink-0 items-center justify-center border-b border-[#2A2F3A] px-1">
         {Brand}
-        <button
-          type="button"
-          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
-          onClick={onToggleCollapsed}
-          className="hidden rounded-md p-2 text-[#B0B8C5] hover:bg-[#11141A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] sm:inline-flex"
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </button>
       </div>
 
       <div className="sidebar-scroll flex-1 min-h-0 overflow-x-hidden overflow-y-auto px-2 py-2">
@@ -170,6 +164,21 @@ export function Sidebar({
           {items.adminItems.length > 0 && <div className="my-2 border-t border-[#2A2F3A]" />}
           {items.userItems.map((item) => renderNavItem(item.key, item))}
         </nav>
+      </div>
+
+      <div className="hidden shrink-0 border-t border-[#2A2F3A] px-2 py-1.5 sm:flex sm:justify-center">
+        <button
+          type="button"
+          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
+          onClick={onToggleCollapsed}
+          className="rounded-md p-2 text-[#B0B8C5] hover:bg-[#11141A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]"
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </button>
       </div>
 
       <div className="shrink-0 border-t border-[#2A2F3A] px-2 pb-2 pt-1.5">
@@ -269,36 +278,22 @@ export function Sidebar({
         >
           {/* On mobile, treat expanded mode always for better readability */}
           <div className="h-full">
-            <div className="h-14 px-3 pt-1">
-              <div className="flex h-full items-center justify-between">
-                <div className="flex min-w-0 flex-1 items-center justify-center py-2">
-                  <MelardoLogo className="h-10 w-full max-w-[220px] object-contain mx-auto" />
+            <div className="h-16 shrink-0 border-b border-[#2A2F3A] px-2 pt-1">
+              <div className="relative flex h-full items-center">
+                <div className="flex min-w-0 flex-1 items-center justify-center px-6 py-2">
+                  <MelardoLogo className="h-[52px] w-full max-w-[220px] object-contain object-center" />
                 </div>
-                <button
-                  type="button"
-                  aria-label="Свернуть / развернуть меню"
-                  onClick={() => {
-                    onToggleCollapsed();
-                  }}
-                  className="rounded-md p-2 hover:bg-[#11141A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]"
-                >
-                  {collapsed ? (
-                    <ChevronRight className="h-4 w-4" />
-                  ) : (
-                    <ChevronLeft className="h-4 w-4" />
-                  )}
-                </button>
                 <button
                   type="button"
                   aria-label="Закрыть меню"
                   onClick={closeMobileDrawer}
-                  className="ml-1 rounded-md p-2 hover:bg-[#11141A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-2 text-[#B0B8C5] hover:bg-[#11141A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
-            <div className="flex h-[calc(100dvh-3.5rem)] flex-col">
+            <div className="flex h-[calc(100dvh-4rem)] flex-col">
               {/* Reuse navigation but force text visible */}
               <div className="sidebar-scroll flex-1 overflow-y-auto px-2 pb-2">
                 <nav className="space-y-2">

@@ -10,7 +10,7 @@ const formsReport: {
   notes: string[];
 }[] = [];
 
-test.describe("MELARDO WARFACE — тестирование форм", () => {
+test.describe("MELARDO — тестирование форм", () => {
   test("1. Регистрация /register — заполнение и валидация", async ({ page }) => {
     await page.goto(`${BASE}/register`, { waitUntil: "domcontentloaded", timeout: 15000 });
 
@@ -249,7 +249,7 @@ test.describe("MELARDO WARFACE — тестирование форм", () => {
     const fs = await import("fs");
     const path = await import("path");
     const reportText = `
-========== ОТЧЁТ ТЕСТИРОВАНИЯ ФОРМ MELARDO WARFACE ==========
+========== ОТЧЁТ ТЕСТИРОВАНИЯ ФОРМ MELARDO ==========
 
 ${formsReport
   .map(
