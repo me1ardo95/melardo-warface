@@ -71,7 +71,7 @@ export function InternalSidebarLayout({
             ["--sidebar-width" as any]: `${leftPadding}px`,
           } as CSSProperties
         }
-        className="min-h-dvh transition-[padding-left] duration-200 ease-out sm:pl-[var(--sidebar-width)]"
+        className="min-h-dvh transition-[padding-left] duration-300 ease-out sm:pl-[var(--sidebar-width)]"
       >
         <main className="w-full px-4 pb-10 pt-6 sm:px-6">{children}</main>
       </div>

@@ -74,7 +74,7 @@ export function Sidebar({
   const renderNavItem = (
     key: string,
     item: DashboardNavItem,
-    opts?: { forceShowText?: boolean }
+    opts?: { forceShowText?: boolean; disableFocus?: boolean }
   ) => {
     const active = isNavItemActive(pathname, item);
     const Icon = item.icon;
@@ -95,6 +95,7 @@ export function Sidebar({
         href={item.href}
         title={!showText ? item.label : undefined}
         aria-label={item.label}
+        tabIndex={opts?.disableFocus ? -1 : undefined}
         onClick={() => {
           closeMobileDrawer();
         }}
@@ -103,8 +104,10 @@ export function Sidebar({
         <Icon className="h-5 w-5 shrink-0" />
         <span
           className={[
-            "truncate text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
-            showText ? "max-w-[200px] opacity-100" : "max-w-0 overflow-hidden opacity-0",
+            "truncate text-sm font-medium whitespace-nowrap transition-all duration-200 ease-out",
+            showText
+              ? "max-w-[200px] translate-x-0 opacity-100"
+              : "max-w-0 translate-x-1 overflow-hidden opacity-0",
           ].join(" ")}
           aria-hidden={!showText}
         >
@@ -154,6 +157,13 @@ export function Sidebar({
       : "border-transparent text-[#B0B8C5] hover:border-[#3d3d3d] hover:bg-[#11141A] hover:text-white",
   ].join(" ");
 
+  const adminSubmenuPanelClass = [
+    "overflow-hidden transition-[max-height,opacity,transform] duration-200 ease-out",
+    adminOpen
+      ? "pointer-events-auto max-h-96 translate-y-0 opacity-100"
+      : "pointer-events-none max-h-0 -translate-y-1 opacity-0",
+  ].join(" ");
+
   const SidebarCore = (
     <>
       <div className="flex h-16 shrink-0 items-center justify-center border-b border-[#2A2F3A] px-1">
@@ -175,21 +185,28 @@ export function Sidebar({
                 <Wrench className="h-5 w-5 shrink-0" aria-hidden />
                 <span
                   className={[
-                    "min-w-0 truncate text-left text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
+                    "min-w-0 truncate text-left text-sm font-medium whitespace-nowrap transition-all duration-200 ease-out",
                     collapsed
-                      ? "max-w-0 overflow-hidden opacity-0"
-                      : "max-w-[200px] opacity-100",
+                      ? "max-w-0 translate-x-1 overflow-hidden opacity-0"
+                      : "max-w-[200px] translate-x-0 opacity-100",
                   ].join(" ")}
                   aria-hidden={collapsed}
                 >
                   Админ панель
                 </span>
               </div>
-              {adminOpen && (
-                <div className={collapsed ? "space-y-1" : "space-y-1 pl-2"}>
-                  {items.adminItems.map((item) => renderNavItem(item.key, item))}
+              <div className={adminSubmenuPanelClass} aria-hidden={!adminOpen}>
+                <div
+                  className={[
+                    "-mt-1 pt-1",
+                    collapsed ? "space-y-1" : "space-y-1 pl-2",
+                  ].join(" ")}
+                >
+                  {items.adminItems.map((item) =>
+                    renderNavItem(item.key, item, { disableFocus: !adminOpen })
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
           {items.adminItems.length > 0 && <div className="my-2 border-t border-[#2A2F3A]" />}
@@ -222,8 +239,10 @@ export function Sidebar({
           )}
           <div
             className={[
-              "min-w-0 overflow-hidden transition-[max-width,opacity] duration-200 ease-out",
-              collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100",
+              "min-w-0 overflow-hidden transition-all duration-200 ease-out",
+              collapsed
+                ? "max-w-0 translate-x-1 opacity-0"
+                : "max-w-[200px] translate-x-0 opacity-100",
             ].join(" ")}
             aria-hidden={collapsed}
           >
@@ -251,8 +270,10 @@ export function Sidebar({
             <LogOut className="h-5 w-5 shrink-0" />
             <span
               className={[
-                "truncate text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
-                collapsed ? "max-w-0 overflow-hidden opacity-0" : "max-w-[120px] opacity-100",
+                "truncate text-sm font-medium whitespace-nowrap transition-all duration-200 ease-out",
+                collapsed
+                  ? "max-w-0 translate-x-1 overflow-hidden opacity-0"
+                  : "max-w-[120px] translate-x-0 opacity-100",
               ].join(" ")}
               aria-hidden={collapsed}
             >
@@ -268,7 +289,7 @@ export function Sidebar({
     <>
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-[#2A2F3A] bg-[#0B0F14] text-[#B0B8C5] transition-[width] duration-200 ease-out sm:flex",
+          "fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-[#2A2F3A] bg-[#0B0F14] text-[#B0B8C5] transition-[width] duration-300 ease-out sm:flex",
         ].join(" ")}
         style={{
           width: collapsed ? 72 : 236,
@@ -341,13 +362,16 @@ export function Sidebar({
                           <Wrench className="h-5 w-5 shrink-0" aria-hidden />
                           <span className="text-sm font-medium">Админ панель</span>
                         </div>
-                        {adminOpen && (
-                          <div className="space-y-1 pl-2">
+                        <div className={adminSubmenuPanelClass} aria-hidden={!adminOpen}>
+                          <div className="-mt-1 space-y-1 pt-1 pl-2">
                             {items.adminItems.map((item) =>
-                              renderNavItem(item.key, item, { forceShowText: true })
+                              renderNavItem(item.key, item, {
+                                forceShowText: true,
+                                disableFocus: !adminOpen,
+                              })
                             )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     </>
                   )}
