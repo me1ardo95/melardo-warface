@@ -14,33 +14,17 @@ type InternalSidebarLayoutProps = {
 
 const COLLAPSED_WIDTH = 72;
 const EXPANDED_WIDTH = 236;
-const LS_KEY = "dashboardSidebarCollapsed";
 
 export function InternalSidebarLayout({
   profile,
   isAdmin,
   children,
 }: InternalSidebarLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  /** Desktop: sidebar expands on hover; default is icon-only rail. */
+  const [desktopSidebarExpanded, setDesktopSidebarExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw === "false") setCollapsed(false);
-      if (raw === "true") setCollapsed(true);
-    } catch {
-      // no-op
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(LS_KEY, String(collapsed));
-    } catch {
-      // no-op
-    }
-  }, [collapsed]);
+  const collapsed = !desktopSidebarExpanded;
 
   useEffect(() => {
     // Close drawer on Escape for accessibility.
@@ -53,8 +37,8 @@ export function InternalSidebarLayout({
   }, [mobileOpen]);
 
   const leftPadding = useMemo(
-    () => (collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH),
-    [collapsed]
+    () => (desktopSidebarExpanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH),
+    [desktopSidebarExpanded]
   );
 
   return (
@@ -75,7 +59,7 @@ export function InternalSidebarLayout({
         profile={profile}
         isAdmin={isAdmin}
         collapsed={collapsed}
-        onToggleCollapsed={() => setCollapsed((v) => !v)}
+        onDesktopExpandedChange={setDesktopSidebarExpanded}
         mobileOpen={mobileOpen}
         onMobileOpenChange={setMobileOpen}
       />
@@ -87,7 +71,7 @@ export function InternalSidebarLayout({
             ["--sidebar-width" as any]: `${leftPadding}px`,
           } as CSSProperties
         }
-        className="min-h-dvh sm:pl-[var(--sidebar-width)]"
+        className="min-h-dvh transition-[padding-left] duration-200 ease-out sm:pl-[var(--sidebar-width)]"
       >
         <main className="w-full px-4 pb-10 pt-6 sm:px-6">{children}</main>
       </div>

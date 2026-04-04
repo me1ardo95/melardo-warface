@@ -13,13 +13,14 @@ import {
   isNavItemVisible,
   userDashboardNav,
 } from "./dashboardNavConfig";
-import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Wrench, X } from "lucide-react";
+import { ChevronDown, LogOut, Wrench, X } from "lucide-react";
 
 type SidebarProps = {
   profile: Profile;
   isAdmin: boolean;
   collapsed: boolean;
-  onToggleCollapsed: () => void;
+  /** Desktop rail: true while pointer is over the fixed sidebar (hover expand). */
+  onDesktopExpandedChange: (expanded: boolean) => void;
   mobileOpen: boolean;
   onMobileOpenChange: (next: boolean) => void;
 };
@@ -32,7 +33,7 @@ export function Sidebar({
   profile,
   isAdmin,
   collapsed,
-  onToggleCollapsed,
+  onDesktopExpandedChange,
   mobileOpen,
   onMobileOpenChange,
 }: SidebarProps) {
@@ -73,9 +74,11 @@ export function Sidebar({
     const active = isNavItemActive(pathname, item);
     const Icon = item.icon;
     const showText = opts?.forceShowText ?? !collapsed;
+    const iconOnly = !showText;
 
     const className = [
-      "group flex h-10 w-full items-center gap-3 rounded-md border px-2 transition-colors duration-200",
+      "group flex h-10 w-full min-w-0 items-center rounded-md border transition-colors duration-200",
+      iconOnly ? "justify-center gap-0 px-0" : "justify-start gap-3 px-2",
       active
         ? "border-[#F97316]/40 bg-[#F97316]/10 text-white"
         : "border-transparent text-[#B0B8C5] hover:border-[#3d3d3d] hover:bg-[#11141A] hover:text-white",
@@ -94,11 +97,15 @@ export function Sidebar({
         className={className}
       >
         <Icon className="h-5 w-5 shrink-0" />
-        {showText && (
-          <span className="truncate text-sm font-medium">
-            {item.label}
-          </span>
-        )}
+        <span
+          className={[
+            "truncate text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
+            showText ? "max-w-[200px] opacity-100" : "max-w-0 overflow-hidden opacity-0",
+          ].join(" ")}
+          aria-hidden={!showText}
+        >
+          {item.label}
+        </span>
       </Link>
     );
   };
@@ -106,10 +113,10 @@ export function Sidebar({
   const avatarInitial = getDisplayName(profile).charAt(0).toUpperCase();
 
   const Brand = (
-    <div className="flex w-full min-w-0 items-center justify-center px-2 py-2">
+    <div className="flex w-full min-w-0 items-center justify-center overflow-hidden px-2 py-2">
       <MelardoLogo
         className={[
-          "object-contain object-center",
+          "object-contain object-center transition-[width,height,max-width] duration-200 ease-out",
           collapsed
             ? "h-10 w-10 max-w-full"
             : "h-[52px] w-full max-w-[min(212px,calc(100%-8px))]",
@@ -133,7 +140,8 @@ export function Sidebar({
                 onClick={() => setAdminPanelOpen((v) => !v)}
                 aria-expanded={adminPanelOpen}
                 className={[
-                  "group flex h-10 w-full items-center gap-3 rounded-md border px-2 transition-colors duration-200",
+                  "group flex h-10 w-full min-w-0 items-center rounded-md border transition-colors duration-200",
+                  collapsed ? "justify-center gap-0 px-0" : "justify-start gap-3 px-2",
                   isAnyAdminActive
                     ? "border-[#F97316]/40 bg-[#F97316]/10 text-white"
                     : "border-transparent text-[#B0B8C5] hover:border-[#3d3d3d] hover:bg-[#11141A] hover:text-white",
@@ -141,12 +149,21 @@ export function Sidebar({
                 ].join(" ")}
               >
                 <Wrench className="h-5 w-5 shrink-0" />
-                <span className={collapsed ? "sm:hidden" : undefined}>
+                <span
+                  className={[
+                    "min-w-0 truncate text-left text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
+                    collapsed
+                      ? "max-w-0 overflow-hidden opacity-0"
+                      : "max-w-[200px] opacity-100",
+                  ].join(" ")}
+                  aria-hidden={collapsed}
+                >
                   Админ панель
                 </span>
                 <ChevronDown
                   className={[
-                    "ml-auto h-4 w-4 shrink-0 text-[#8B93A3] transition-transform duration-200",
+                    "h-4 w-4 shrink-0 text-[#8B93A3] transition-transform duration-200",
+                    collapsed ? "hidden" : "ml-auto",
                     adminPanelOpen ? "rotate-180" : "rotate-0",
                   ].join(" ")}
                 />
@@ -164,21 +181,6 @@ export function Sidebar({
           {items.adminItems.length > 0 && <div className="my-2 border-t border-[#2A2F3A]" />}
           {items.userItems.map((item) => renderNavItem(item.key, item))}
         </nav>
-      </div>
-
-      <div className="hidden shrink-0 border-t border-[#2A2F3A] px-2 py-1.5 sm:flex sm:justify-center">
-        <button
-          type="button"
-          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
-          onClick={onToggleCollapsed}
-          className="rounded-md p-2 text-[#B0B8C5] hover:bg-[#11141A] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]"
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </button>
       </div>
 
       <div className="shrink-0 border-t border-[#2A2F3A] px-2 pb-2 pt-1.5">
@@ -204,18 +206,22 @@ export function Sidebar({
               {avatarInitial}
             </div>
           )}
-          {!collapsed && (
-            <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-white">
-                {getDisplayName(profile)}
-              </div>
-              {profile.warface_nick && (
-                <div className="truncate text-[11px] text-[#B0B8C5]">
-                  {profile.warface_nick}
-                </div>
-              )}
+          <div
+            className={[
+              "min-w-0 overflow-hidden transition-[max-width,opacity] duration-200 ease-out",
+              collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100",
+            ].join(" ")}
+            aria-hidden={collapsed}
+          >
+            <div className="truncate text-sm font-semibold text-white">
+              {getDisplayName(profile)}
             </div>
-          )}
+            {profile.warface_nick && (
+              <div className="truncate text-[11px] text-[#B0B8C5]">
+                {profile.warface_nick}
+              </div>
+            )}
+          </div>
         </Link>
 
         <form action={signOut} className="mt-1.5">
@@ -228,8 +234,16 @@ export function Sidebar({
               collapsed ? "gap-0" : "gap-3",
             ].join(" ")}
           >
-            <LogOut className="h-5 w-5" />
-            {!collapsed && <span className="text-sm font-medium">Выйти</span>}
+            <LogOut className="h-5 w-5 shrink-0" />
+            <span
+              className={[
+                "truncate text-sm font-medium whitespace-nowrap transition-[max-width,opacity] duration-200 ease-out",
+                collapsed ? "max-w-0 overflow-hidden opacity-0" : "max-w-[120px] opacity-100",
+              ].join(" ")}
+              aria-hidden={collapsed}
+            >
+              Выйти
+            </span>
           </button>
         </form>
       </div>
@@ -241,11 +255,13 @@ export function Sidebar({
       {/* Desktop sidebar */}
       <aside
         className={[
-          "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-[#2A2F3A] bg-[#0B0F14] text-[#B0B8C5] sm:flex",
+          "fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-[#2A2F3A] bg-[#0B0F14] text-[#B0B8C5] transition-[width] duration-200 ease-out sm:flex",
         ].join(" ")}
         style={{
           width: collapsed ? 72 : 236,
         }}
+        onMouseEnter={() => onDesktopExpandedChange(true)}
+        onMouseLeave={() => onDesktopExpandedChange(false)}
       >
         {SidebarCore}
       </aside>
@@ -326,7 +342,7 @@ export function Sidebar({
                       </button>
 
                       {adminPanelOpen && (
-                        <div className={collapsed ? "space-y-1" : "space-y-1 pl-2"}>
+                        <div className="space-y-1 pl-2">
                           {items.adminItems.map((item) =>
                             renderNavItem(item.key, item, { forceShowText: true })
                           )}
