@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Profile } from "@/lib/types";
 import { signOut } from "@/app/actions/auth";
 import { MelardoLogo } from "@/app/components/branding/MelardoLogo";
+import { MelardoMark } from "@/app/components/branding/MelardoMark";
 import {
   adminDashboardNav,
   DashboardNavItem,
@@ -113,15 +114,25 @@ export function Sidebar({
   const avatarInitial = getDisplayName(profile).charAt(0).toUpperCase();
 
   const Brand = (
-    <div className="flex w-full min-w-0 items-center justify-center overflow-hidden px-2 py-2">
-      <MelardoLogo
+    <div className="relative h-full w-full min-w-0 overflow-hidden">
+      <div
         className={[
-          "object-contain object-center transition-[width,height,max-width] duration-200 ease-out",
-          collapsed
-            ? "h-10 w-10 max-w-full"
-            : "h-[52px] w-full max-w-[min(212px,calc(100%-8px))]",
+          "absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-200 ease-out",
+          collapsed ? "opacity-100" : "pointer-events-none opacity-0",
         ].join(" ")}
-      />
+        aria-hidden={!collapsed}
+      >
+        <MelardoMark className="h-9 w-9 shrink-0" />
+      </div>
+      <div
+        className={[
+          "absolute inset-0 z-10 flex items-center justify-center px-1 transition-opacity duration-200 ease-out",
+          collapsed ? "pointer-events-none opacity-0" : "opacity-100",
+        ].join(" ")}
+        aria-hidden={collapsed}
+      >
+        <MelardoLogo className="h-11 w-full max-w-[min(220px,calc(100%-4px))] shrink-0 object-contain object-center" />
+      </div>
     </div>
   );
 

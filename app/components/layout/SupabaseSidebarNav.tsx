@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
-import { MelardoLogo } from "@/app/components/branding/MelardoLogo";
+import { MelardoMark } from "@/app/components/branding/MelardoMark";
 
 type NavLink = { label: string; href: string };
 
@@ -235,7 +235,7 @@ export function SupabaseSidebarNav() {
           title="MELARDO"
         >
           <div className="flex w-full min-w-0 flex-col items-center justify-center px-0.5 leading-none">
-            <MelardoLogo className="h-[52px] w-full min-w-0 max-w-full object-contain object-center" />
+            <MelardoMark className="h-10 w-10 shrink-0 object-contain object-center" />
           </div>
         </Link>
       </div>
