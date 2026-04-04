@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
-import { AdminNav } from "../AdminNav";
 import { ComplaintsActions } from "./ComplaintsActions";
 
 type ComplaintRow = {
@@ -94,8 +93,6 @@ export default async function AdminComplaintsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="complaints" />
-
       <div className="mx-auto max-w-5xl space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

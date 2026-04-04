@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
 import type { Profile } from "@/lib/types";
-import { AdminNav } from "../AdminNav";
 
 type AdminPlayer = Pick<
   Profile,
@@ -31,8 +30,6 @@ export default async function AdminPlayersPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="players" />
-
       <div className="mx-auto max-w-5xl space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

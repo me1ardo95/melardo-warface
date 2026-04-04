@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/app/actions/data";
-import { AdminNav } from "@/app/admin/AdminNav";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -61,7 +60,6 @@ export default async function AdminTournamentTeamsPage({ params }: Props) {
 
   return (
     <div className="min-h-screen p-4 sm:p-6">
-      <AdminNav active="tournaments" />
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div>

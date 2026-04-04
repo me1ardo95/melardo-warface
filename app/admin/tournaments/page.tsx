@@ -4,7 +4,6 @@ import {
   getCurrentProfile,
   getTournamentsWithDetails,
 } from "@/app/actions/data";
-import { AdminNav } from "../AdminNav";
 import { GenerateBracketButton } from "./GenerateBracketButton";
 import { DeleteTournamentButton } from "./DeleteTournamentButton";
 import { CreateDailyTournamentButton } from "./CreateDailyTournamentButton";
@@ -30,8 +29,6 @@ export default async function AdminTournamentsPage() {
 
   return (
     <div className="min-h-screen p-4 sm:p-6">
-      <AdminNav active="tournaments" />
-
       <div className="mx-auto max-w-6xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

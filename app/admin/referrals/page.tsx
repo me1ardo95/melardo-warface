@@ -2,8 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
 import type { Referral, Profile } from "@/lib/types";
-import { AdminNav } from "../AdminNav";
-
 type ReferralWithUsers = Referral & {
   referrer?: Pick<Profile, "id" | "warface_nick" | "display_name"> | null;
   referred?: Pick<Profile, "id" | "warface_nick" | "display_name"> | null;
@@ -79,7 +77,6 @@ export default async function AdminReferralsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="referrals" />
       <div className="mx-auto max-w-4xl space-y-4">
         <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
           Реферальные заявки

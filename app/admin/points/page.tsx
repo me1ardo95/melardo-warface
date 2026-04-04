@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
-import { AdminNav } from "../AdminNav";
-
 async function adjustPlayerPoints(formData: FormData) {
   "use server";
   const supabase = await createClient();
@@ -76,8 +74,6 @@ export default async function AdminPointsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="points" />
-
       <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
         <div className="card-surface p-6">
           <h2 className="text-sm tracking-[0.18em] text-[#F9FAFB] [font-family:var(--font-display-primary)]">

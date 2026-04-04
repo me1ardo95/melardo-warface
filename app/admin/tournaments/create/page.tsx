@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AdminNav } from "../../AdminNav";
 
 export default function AdminTournamentCreatePage() {
   const router = useRouter();
@@ -84,7 +83,6 @@ export default function AdminTournamentCreatePage() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6">
-      <AdminNav active="tournaments" />
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

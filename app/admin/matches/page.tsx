@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, getMatchesWithDetails } from "@/app/actions/data";
 import type { Match, Team, Tournament } from "@/lib/types";
-import { AdminNav } from "../AdminNav";
 
 type MatchWithDetails = Match & {
   team1?: Team;
@@ -91,8 +90,6 @@ export default async function AdminMatchesPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="matches" />
-
       <div className="mx-auto max-w-5xl space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

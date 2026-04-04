@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile, getTeams, getTournaments } from "@/app/actions/data";
-import { AdminNav } from "./AdminNav";
 import AdminProfileTeamSearch from "./AdminProfileTeamSearch";
 
 export default async function AdminPage() {
@@ -15,8 +14,6 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen p-4 sm:p-6">
-      <AdminNav active="home" />
-
       <div className="mx-auto max-w-4xl space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

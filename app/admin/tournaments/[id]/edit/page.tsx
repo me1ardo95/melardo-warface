@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { AdminNav } from "@/app/admin/AdminNav";
 
 type Tournament = {
   id: string;
@@ -111,7 +110,6 @@ export default function AdminTournamentEditPage() {
   if (loading) {
     return (
       <div className="min-h-screen px-4 py-6 sm:px-6">
-        <AdminNav active="tournaments" />
         <div className="mx-auto max-w-3xl">
           <p className="text-neutral-500 dark:text-neutral-400">Загрузка…</p>
         </div>
@@ -122,7 +120,6 @@ export default function AdminTournamentEditPage() {
   if (!tournament) {
     return (
       <div className="min-h-screen px-4 py-6 sm:px-6">
-        <AdminNav active="tournaments" />
         <div className="mx-auto max-w-3xl">
           <p className="text-red-500">Турнир не найден.</p>
           <Link href="/admin/tournaments" className="mt-2 inline-block text-blue-600 hover:underline dark:text-blue-400">
@@ -142,7 +139,6 @@ export default function AdminTournamentEditPage() {
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6">
-      <AdminNav active="tournaments" />
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

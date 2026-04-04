@@ -2,8 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
 import type { Season } from "@/lib/types";
-import { AdminNav } from "../AdminNav";
-
 async function getSeasons(): Promise<Season[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -25,8 +23,6 @@ export default async function AdminSeasonsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="seasons" />
-
       <div className="mx-auto max-w-4xl space-y-4">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">

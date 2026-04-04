@@ -2,8 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/app/actions/data";
 import type { Donation, Profile, Team } from "@/lib/types";
-import { AdminNav } from "../AdminNav";
-
 type DonationWithRelations = Donation & {
   user?: Pick<Profile, "id" | "warface_nick" | "display_name"> | null;
   team?: Pick<Team, "id" | "name"> | null;
@@ -133,8 +131,6 @@ export default async function AdminDonationsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <AdminNav active="donations" />
-
       <div className="mx-auto max-w-4xl space-y-4">
         <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
           Подтверждение донатов
