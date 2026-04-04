@@ -41,7 +41,7 @@ export default async function Home() {
             MELARDO
           </h1>
           <p className="text-base text-[#F97316] tracking-[0.12em] sm:text-lg [font-family:var(--font-display-alt)]">
-            Киберспортивная платформа Warface
+            Киберспортивная платформа для Warface
           </p>
           <p className="max-w-xl text-sm leading-relaxed text-[#B0B8C5] sm:text-base">
             Создавай команды, участвуй в турнирах и поднимайся в рейтинге.

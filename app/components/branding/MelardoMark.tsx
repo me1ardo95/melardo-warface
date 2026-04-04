@@ -8,7 +8,7 @@ type MelardoMarkProps = {
 };
 
 /**
- * Компактная монограмма для свернутого sidebar: угловой шеврон + M, красный акцент снизу.
+ * Угловая монограмма M для свёрнутого sidebar: одна буква, острые грани, красный акцент снизу.
  */
 export function MelardoMark({
   className,
@@ -19,7 +19,7 @@ export function MelardoMark({
 
   return (
     <svg
-      viewBox="0 0 44 44"
+      viewBox="0 0 40 44"
       role="img"
       aria-label={title}
       className={className}
@@ -28,28 +28,21 @@ export function MelardoMark({
       <title>{title}</title>
       <defs>
         <linearGradient id={accent} x1="0%" y1="50%" x2="100%" y2="50%">
-          <stop offset="0%" stopColor="#B91C1C" />
+          <stop offset="0%" stopColor="#991B1B" />
           <stop offset="50%" stopColor="#EF4444" />
-          <stop offset="100%" stopColor="#B91C1C" />
+          <stop offset="100%" stopColor="#991B1B" />
         </linearGradient>
       </defs>
 
-      {/* Угловой шеврон (слева) */}
+      {/* Угловая M: срез слева сверху, острый «клык», без второй буквы */}
       <path
         fill="#F9FAFB"
-        d="M4 36 L4 12 L11 6 L13 10 L9 15 L9 36 Z"
+        d="M6 34 L6 12 L10 6 L16 6 L20 16 L26 6 L34 6 L34 34 L26 34 L26 14 L20 22 L14 14 L14 34 Z"
       />
 
-      {/* Буква M */}
-      <path
-        fill="#F9FAFB"
-        d="M15 10 L15 36 L21 36 L21 24 L27 32 L33 24 L33 36 L40 36 L40 10 L33 10 L27 19 L21 10 Z"
-      />
-
-      {/* Красный нижний акцент */}
       <path
         fill={`url(#${accent})`}
-        d="M3 37 L41 37 L39 42 L5 42 Z"
+        d="M5 35 L35 35 L33 40 L7 40 Z"
       />
     </svg>
   );
