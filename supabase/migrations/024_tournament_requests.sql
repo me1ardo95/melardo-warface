@@ -1,6 +1,6 @@
 -- Tournament requests: user-submitted requests to create a tournament (admin approves/rejects)
 create table if not exists public.tournament_requests (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   mode text not null check (mode in ('5x5', '8x8')),
@@ -44,3 +44,4 @@ create policy "Admins can update tournament requests"
 create trigger set_tournament_requests_updated_at
   before update on public.tournament_requests
   for each row execute function public.set_updated_at();
+

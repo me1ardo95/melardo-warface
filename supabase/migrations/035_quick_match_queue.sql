@@ -27,3 +27,4 @@ create policy "Users can insert queue entries"
 create policy "Users can update own queue entries"
   on public.quick_match_queue for update
   using (auth.uid() = user_id);
+

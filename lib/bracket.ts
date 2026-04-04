@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateSecretPhrase, WARFACE_MAPS } from "@/lib/warface";
+import { enqueueTelegramNotification } from "@/lib/telegram-queue";
 
 type BracketTeam = { id: string; name: string };
 
@@ -209,6 +210,23 @@ export async function generateBracket(
     }
 
     createdMatchIds.push(match.id as string);
+
+    // Telegram: нужно подтвердить результат (captains обеих команд)
+    try {
+      const { data: captains } = await supabase
+        .from("team_members")
+        .select("user_id")
+        .in("team_id", [b.team1_id, b.team2_id])
+        .eq("role", "captain");
+
+      (captains ?? []).forEach((c) => {
+        void enqueueTelegramNotification(c.user_id as string, "match_result_confirmation_required", {
+          match_id: match.id,
+        });
+      });
+    } catch {
+      // уведомления не критичны
+    }
 
     await supabase
       .from("tournament_brackets")

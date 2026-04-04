@@ -132,3 +132,4 @@ create policy "Admins can manage tournament_rewards"
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
 
+

@@ -45,7 +45,7 @@ create or replace trigger on_auth_user_created
 
 -- Teams
 create table public.teams (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   name text not null,
   logo_url text,
   created_at timestamptz default now() not null,
@@ -72,7 +72,7 @@ create policy "Authenticated users can delete teams"
 
 -- Tournaments
 create table public.tournaments (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   name text not null,
   game text,
   start_date timestamptz,
@@ -94,7 +94,7 @@ create policy "Authenticated users can manage tournaments"
 
 -- Matches (references teams and tournaments)
 create table public.matches (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   tournament_id uuid references public.tournaments(id) on delete set null,
   team1_id uuid references public.teams(id) on delete set null,
   team2_id uuid references public.teams(id) on delete set null,
@@ -119,7 +119,7 @@ create policy "Authenticated users can manage matches"
 
 -- Rankings (per tournament)
 create table public.rankings (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   tournament_id uuid not null references public.tournaments(id) on delete cascade,
   team_id uuid not null references public.teams(id) on delete cascade,
   rank int not null,
@@ -160,3 +160,5 @@ create trigger set_matches_updated_at before update on public.matches
   for each row execute function public.set_updated_at();
 create trigger set_rankings_updated_at before update on public.rankings
   for each row execute function public.set_updated_at();
+
+

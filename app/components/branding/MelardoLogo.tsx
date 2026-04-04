@@ -1,151 +1,158 @@
-"use client";
-
-import { useId } from "react";
+// app/components/branding/MelardoLogo.tsx
+import * as React from "react";
 
 type MelardoLogoProps = {
   className?: string;
-  title?: string;
 };
 
-/**
- * Wordmark MELARDO в духе референса: металлические буквы, наклон, оранжево-красная «A» со врезом, линия-свечение снизу.
- */
-export function MelardoLogo({ className, title = "MELARDO" }: MelardoLogoProps) {
-  const uid = useId().replace(/:/g, "");
-  const metal = `ml-metal-${uid}`;
-  const redA = `ml-redA-${uid}`;
-  const under = `ml-under-${uid}`;
-  const aGlow = `ml-aGlow-${uid}`;
-  const underGlow = `ml-underGlow-${uid}`;
-
+export function MelardoLogo({ className }: MelardoLogoProps) {
   return (
     <svg
-      viewBox="0 0 440 96"
-      role="img"
-      aria-label={title}
-      className={className}
+      viewBox="0 0 520 130"
       xmlns="http://www.w3.org/2000/svg"
+      aria-label="Melardo logo"
+      className={className}
       preserveAspectRatio="xMidYMid meet"
     >
-      <title>{title}</title>
       <defs>
-        <linearGradient id={metal} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="22%" stopColor="#E8EAED" />
-          <stop offset="45%" stopColor="#B8BCC4" />
-          <stop offset="72%" stopColor="#8E939E" />
-          <stop offset="100%" stopColor="#6B6F7A" />
+        <linearGradient id="melardo-metal" x1="34" y1="10" x2="454" y2="118" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFF6F1" />
+          <stop offset="0.12" stopColor="#FFFFFF" />
+          <stop offset="0.28" stopColor="#EEF1F7" />
+          <stop offset="0.5" stopColor="#D5DBE7" />
+          <stop offset="0.73" stopColor="#B8C0CE" />
+          <stop offset="1" stopColor="#909AAD" />
         </linearGradient>
-        <linearGradient id={redA} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#FFB14A" />
-          <stop offset="35%" stopColor="#FF6B35" />
-          <stop offset="70%" stopColor="#FF3B1F" />
-          <stop offset="100%" stopColor="#D62816" />
+
+        <linearGradient id="melardo-metal-shadow" x1="90" y1="38" x2="440" y2="118" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
+          <stop offset="0.42" stopColor="#B7BFCC" stopOpacity="0.06" />
+          <stop offset="0.72" stopColor="#7A8496" stopOpacity="0.22" />
+          <stop offset="1" stopColor="#5B6476" stopOpacity="0.5" />
         </linearGradient>
-        <linearGradient id={under} x1="0%" y1="50%" x2="100%" y2="50%">
-          <stop offset="0%" stopColor="#FF4500" stopOpacity="0.15" />
-          <stop offset="38%" stopColor="#FF6B35" stopOpacity="0.55" />
-          <stop offset="50%" stopColor="#FF9A6B" stopOpacity="1" />
-          <stop offset="62%" stopColor="#FF6B35" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#FF4500" stopOpacity="0.15" />
+
+        <linearGradient id="melardo-red" x1="214" y1="12" x2="252" y2="104" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FF5445" />
+          <stop offset="0.24" stopColor="#FF3A2F" />
+          <stop offset="0.55" stopColor="#F62620" />
+          <stop offset="1" stopColor="#B81614" />
         </linearGradient>
-        <filter id={aGlow} x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="2.2" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id={underGlow} x="-15%" y="-250%" width="130%" height="600%">
-          <feGaussianBlur stdDeviation="3" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+
+        <linearGradient id="melardo-red-shadow" x1="218" y1="40" x2="252" y2="110" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0" />
+          <stop offset="0.5" stopColor="#A10E10" stopOpacity="0.12" />
+          <stop offset="1" stopColor="#6F0909" stopOpacity="0.34" />
+        </linearGradient>
+
+        <linearGradient id="melardo-line-red" x1="8" y1="18" x2="486" y2="18" gradientUnits="userSpaceOnUse">
+  <stop offset="0" stopColor="#FF2A22" stopOpacity="0.15" />
+  <stop offset="0.2" stopColor="#FF2A22" stopOpacity="0.55" />
+  <stop offset="0.5" stopColor="#FF3B30" stopOpacity="1" />
+  <stop offset="0.8" stopColor="#FF2A22" stopOpacity="0.55" />
+  <stop offset="1" stopColor="#FF2A22" stopOpacity="0.15" />
+</linearGradient>
+
+<filter id="melardo-line-glow" x="-20%" y="-400%" width="160%" height="1000%">
+  <feGaussianBlur stdDeviation="3.2" result="blur" />
+  <feMerge>
+    <feMergeNode in="blur" />
+    <feMergeNode in="SourceGraphic" />
+  </feMerge>
+</filter>
       </defs>
 
-      <g transform="skewX(-10) translate(14 0)">
-        {/* Лёгкий «объём» — сдвиг тени */}
+      <g transform="translate(15 96) skewX(0)">
         <text
-          x="2"
-          y="62"
-          fill="#1a1a1a"
-          fillOpacity="0.55"
-          fontSize="54"
+          x="0"
+          y="0"
+          fill="url(#melardo-metal)"
+          fontSize="85"
           fontWeight="900"
-          fontFamily="Arial Black, Impact, Helvetica Neue, Arial, sans-serif"
-          letterSpacing="-3"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
         >
           MEL
         </text>
         <text
-          x="2"
-          y="62"
-          fill={`url(#${metal})`}
-          fontSize="54"
+          x="0"
+          y="0"
+          fill="url(#melardo-metal-shadow)"
+          fontSize="85"
           fontWeight="900"
-          fontFamily="Arial Black, Impact, Helvetica Neue, Arial, sans-serif"
-          letterSpacing="-3"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
         >
           MEL
         </text>
 
-        {/* A — треугольник с горизонтальным вырезом (как на референсе) */}
-        <g transform="translate(118 0)" filter={`url(#${aGlow})`}>
-          <path
-            fill={`url(#${redA})`}
-            fillRule="evenodd"
-            d="M 29 8 L 54 64 L 45 64 L 38 46 L 20 46 L 13 64 L 4 64 L 29 8 Z M 29 32 L 35 40 L 23 40 Z"
-          />
-        </g>
+        <text
+          x="185"
+          y="0"
+          fill="url(#melardo-red)"
+          fontSize="120"
+          fontWeight="900"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
+        >
+          A
+        </text>
+        <text
+          x="185"
+          y="0"
+          fill="url(#melardo-red-shadow)"
+          fontSize="120"
+          fontWeight="900"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
+        >
+          A
+        </text>
 
         <text
-          x="184"
-          y="62"
-          fill="#1a1a1a"
-          fillOpacity="0.55"
-          fontSize="54"
+          x="285"
+          y="0"
+          fill="url(#melardo-metal)"
+          fontSize="85"
           fontWeight="900"
-          fontFamily="Arial Black, Impact, Helvetica Neue, Arial, sans-serif"
-          letterSpacing="-3"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
         >
           RDO
         </text>
         <text
-          x="184"
-          y="62"
-          fill={`url(#${metal})`}
-          fontSize="54"
+          x="285"
+          y="0"
+          fill="url(#melardo-metal-shadow)"
+          fontSize="85"
           fontWeight="900"
-          fontFamily="Arial Black, Impact, Helvetica Neue, Arial, sans-serif"
-          letterSpacing="-3"
+          letterSpacing="0"
+          fontStyle="normal"
+          fontFamily="Inter, Arial Black, Arial, sans-serif"
         >
           RDO
         </text>
+
+        <path
+  d="M8 18H470"
+  stroke="#FF2A22"
+  strokeWidth="2.4"
+  strokeLinecap="round"
+/>
       </g>
 
-      <g filter={`url(#${underGlow})`}>
-        <line
-          x1="24"
-          y1="78"
-          x2="416"
-          y2="78"
-          stroke={`url(#${under})`}
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <line
-          x1="190"
-          y1="78"
-          x2="250"
-          y2="78"
-          stroke="#FFAB7A"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-      </g>
+      <g filter="url(#melardo-line-glow)">
+  <path
+    d="M8 18H505"
+    stroke="url(#melardo-line-red)"
+    strokeWidth="12.6"
+    strokeLinecap="round"
+  />
+</g>
     </svg>
   );
 }

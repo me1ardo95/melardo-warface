@@ -61,3 +61,4 @@ create policy "Admins can insert match_history"
 -- 3) matches.screenshot_url (основной скриншот при завершении)
 alter table public.matches
   add column if not exists screenshot_url text;
+

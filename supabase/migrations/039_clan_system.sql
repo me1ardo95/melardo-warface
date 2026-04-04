@@ -21,14 +21,7 @@ alter table public.clans enable row level security;
 create policy "Anyone can view clans" on public.clans for select using (true);
 create policy "Authenticated can create clans" on public.clans for insert
   with check (auth.uid() = owner_id);
-create policy "Owner and captains can update clan" on public.clans for update
-  using (
-    auth.uid() = owner_id or
-    exists (
-      select 1 from public.clan_members cm
-      where cm.clan_id = clans.id and cm.user_id = auth.uid() and cm.role in ('owner','captain')
-    )
-  );
+
 create policy "Owner can delete clan" on public.clans for delete
   using (auth.uid() = owner_id);
 
@@ -215,3 +208,15 @@ $$;
 create trigger on_clan_created_add_owner
   after insert on public.clans
   for each row execute function public.on_clan_created_add_owner();
+
+
+
+
+create policy "Owner and captains can update clan" on public.clans for update
+  using (
+    auth.uid() = owner_id or
+    exists (
+      select 1 from public.clan_members cm
+      where cm.clan_id = clans.id and cm.user_id = auth.uid() and cm.role in ('owner','captain')
+    )
+  );

@@ -75,3 +75,4 @@ create policy "Admins can insert match_penalties"
   with check (
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
+

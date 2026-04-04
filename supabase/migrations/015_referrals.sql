@@ -1,7 +1,7 @@
 -- Реферальная система
 
 create table if not exists public.referrals (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   referrer_user_id uuid not null references public.profiles(id) on delete cascade,
   referred_user_id uuid not null references public.profiles(id) on delete cascade,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
@@ -21,4 +21,6 @@ create index if not exists idx_referrals_referrer
 
 create index if not exists idx_referrals_referred
   on public.referrals(referred_user_id);
+
+
 

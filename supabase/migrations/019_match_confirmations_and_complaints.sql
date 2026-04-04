@@ -8,7 +8,7 @@ alter table public.matches add constraint matches_status_check
 
 -- Match confirmations (captain submits score + screenshot)
 create table if not exists public.match_confirmations (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   match_id uuid not null references public.matches(id) on delete cascade,
   captain_id uuid not null references auth.users(id) on delete cascade,
   team_id uuid not null references public.teams(id) on delete cascade,
@@ -59,3 +59,4 @@ create policy "Admins can update complaints"
   using (
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
+

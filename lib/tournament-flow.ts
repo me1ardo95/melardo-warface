@@ -230,6 +230,9 @@ export async function onTournamentMatchCompleted(opts: {
           secret_phrase: secretPhrase,
           round: nextRound,
         });
+        void enqueueTelegramNotification(c.user_id as string, "match_result_confirmation_required", {
+          match_id: createdMatch.id,
+        });
       });
     } catch {
       // уведомления не критичны

@@ -39,3 +39,4 @@ create policy "Authenticated can update scheduled_tournaments"
 create index if not exists idx_profiles_points on public.profiles(points);
 create index if not exists idx_teams_points on public.teams(points);
 create index if not exists idx_matches_created_at on public.matches(created_at);
+

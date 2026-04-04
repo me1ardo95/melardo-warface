@@ -3,7 +3,7 @@
 
 -- Team members (users belonging to a team)
 create table public.team_members (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   team_id uuid not null references public.teams(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   role text default 'member' check (role in ('captain', 'member')),
@@ -37,7 +37,7 @@ create policy "Captains can update role"
 
 -- Challenges (one team challenging another, e.g. for a match)
 create table public.challenges (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   challenger_team_id uuid not null references public.teams(id) on delete cascade,
   challenged_team_id uuid not null references public.teams(id) on delete cascade,
   tournament_id uuid references public.tournaments(id) on delete set null,
@@ -69,7 +69,7 @@ create trigger set_challenges_updated_at before update on public.challenges
 
 -- Complaints (e.g. about a match or conduct)
 create table public.complaints (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   user_id uuid not null references auth.users(id) on delete cascade,
   match_id uuid references public.matches(id) on delete set null,
   tournament_id uuid references public.tournaments(id) on delete set null,
@@ -99,7 +99,7 @@ create trigger set_complaints_updated_at before update on public.complaints
 
 -- Tournament registrations (teams registering for a tournament)
 create table public.tournament_registrations (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   tournament_id uuid not null references public.tournaments(id) on delete cascade,
   team_id uuid not null references public.teams(id) on delete cascade,
   created_at timestamptz default now() not null,
@@ -119,3 +119,5 @@ create policy "Authenticated users can register teams"
 create policy "Authenticated users can unregister"
   on public.tournament_registrations for delete
   using (auth.role() = 'authenticated');
+
+

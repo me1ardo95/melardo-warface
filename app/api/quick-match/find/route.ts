@@ -144,6 +144,9 @@ export async function POST(request: Request) {
       };
       (captains ?? []).forEach((c) => {
         void enqueueTelegramNotification(c.user_id as string, "quick_match_found", basePayload);
+        void enqueueTelegramNotification(c.user_id as string, "match_result_confirmation_required", {
+          match_id: match.id,
+        });
       });
 
       return NextResponse.json({ success: true, match });

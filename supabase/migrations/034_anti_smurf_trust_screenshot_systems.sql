@@ -101,3 +101,4 @@ create policy "Users can view own trust_score_history"
 
 create policy "Service can insert trust_score_history"
   on public.trust_score_history for insert with check (true);
+

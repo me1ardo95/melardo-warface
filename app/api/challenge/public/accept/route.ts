@@ -255,6 +255,9 @@ export async function POST(request: Request) {
         void enqueueTelegramNotification(uid, "match_created", {
           ...payloadBase,
         });
+        void enqueueTelegramNotification(uid, "match_result_confirmation_required", {
+          match_id: match.id,
+        });
       });
 
       challengerCaptains.forEach((c) => {

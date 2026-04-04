@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+# Playwright auth state (cookies / localStorage — не коммитить)
+test-results/sidebar-auth/auth-state.json
 
 # next.js
 /.next/

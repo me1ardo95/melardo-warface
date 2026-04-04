@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { onTournamentMatchCompleted } from "@/lib/tournament-flow";
+import { enqueueTelegramNotification } from "@/lib/telegram-queue";
 
 type Body =
   | { action: "restart_match"; match_id: string }
@@ -38,6 +39,12 @@ export async function POST(request: Request) {
     const matchId = typeof (body as any).match_id === "string" ? (body as any).match_id.trim() : "";
     if (!matchId) return apiError("Не указан match_id", 400);
 
+    const { data: matchRow } = await supabase
+      .from("matches")
+      .select("team1_id, team2_id")
+      .eq("id", matchId)
+      .single();
+
     await supabase.from("match_confirmations").delete().eq("match_id", matchId);
     await supabase
       .from("matches")
@@ -54,6 +61,29 @@ export async function POST(request: Request) {
       .from("tournament_brackets")
       .update({ winner_team_id: null })
       .eq("match_id", matchId);
+
+    // Telegram: нужно подтвердить результат (captains обеих команд)
+    try {
+      const team1Id = matchRow?.team1_id as string | null;
+      const team2Id = matchRow?.team2_id as string | null;
+      if (team1Id && team2Id) {
+        const { data: captains } = await supabase
+          .from("team_members")
+          .select("user_id")
+          .in("team_id", [team1Id, team2Id])
+          .eq("role", "captain");
+
+        (captains ?? []).forEach((c) => {
+          void enqueueTelegramNotification(
+            c.user_id as string,
+            "match_result_confirmation_required",
+            { match_id: matchId }
+          );
+        });
+      }
+    } catch {
+      // уведомления не критичны
+    }
 
     return apiSuccess({ success: true });
   }

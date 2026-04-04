@@ -6,3 +6,4 @@ delete from public.teams
 where id not in (
   select id from public.teams where name = 'Warface-95' limit 1
 );
+

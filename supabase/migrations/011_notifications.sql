@@ -2,7 +2,7 @@
 -- Run after previous migrations in the Supabase SQL Editor
 
 create table public.notifications (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   user_id uuid references public.profiles(id) on delete cascade,
   team_id uuid references public.teams(id) on delete cascade,
   type text not null,
@@ -42,4 +42,6 @@ create index idx_notifications_team
 
 create index idx_notifications_read
   on public.notifications(is_read);
+
+
 

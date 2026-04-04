@@ -2,7 +2,7 @@
 
 -- Table: support_messages (submissions from /support page)
 create table if not exists public.support_messages (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   user_id uuid references auth.users(id) on delete set null,
   name text not null,
   email text not null,
@@ -45,3 +45,4 @@ create policy "Admins can read support bucket"
     bucket_id = 'support' and
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
+

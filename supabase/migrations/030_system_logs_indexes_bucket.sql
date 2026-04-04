@@ -42,12 +42,18 @@ values ('match-screenshots', 'match-screenshots', true, 5242880)
 on conflict (id) do update set file_size_limit = 5242880;
 
 -- Политика загрузки для аутентифицированных
+drop policy if exists "Authenticated can upload match screenshots" on storage.objects;
+
 create policy "Authenticated can upload match screenshots"
   on storage.objects for insert
   with check (
     bucket_id = 'match-screenshots' and auth.role() = 'authenticated'
   );
 
+drop policy if exists "Anyone can view match screenshots" on storage.objects;
+
 create policy "Anyone can view match screenshots"
   on storage.objects for select
   using (bucket_id = 'match-screenshots');
+
+

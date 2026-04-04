@@ -1,7 +1,7 @@
 -- Сезоны и архив сезонных результатов
 
 create table if not exists public.seasons (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   name text not null,
   start_date timestamptz not null,
   end_date timestamptz not null,
@@ -19,7 +19,7 @@ create policy "Admins can manage seasons"
   using (auth.role() = 'authenticated');
 
 create table if not exists public.season_archive (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   season_id uuid not null references public.seasons(id) on delete cascade,
   team_id uuid not null references public.teams(id) on delete cascade,
   final_rank int not null,
@@ -39,4 +39,6 @@ create index if not exists idx_season_archive_season
 
 create index if not exists idx_season_archive_team
   on public.season_archive(team_id);
+
+
 

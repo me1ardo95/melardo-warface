@@ -14,6 +14,7 @@ import type {
   Challenge,
   JoinRequest,
 } from "@/lib/types";
+import { profileFromRow } from "@/lib/profile-role";
 
 // —— Profile (current user) ——
 export async function getCurrentProfile(): Promise<Profile | null> {
@@ -22,12 +23,13 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
-  return data as Profile | null;
+  if (error || !data) return null;
+  return profileFromRow(data as unknown as Record<string, unknown>, user);
 }
 
 export async function getTopPlayers(limit = 5): Promise<Profile[]> {

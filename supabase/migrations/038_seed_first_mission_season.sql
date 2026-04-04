@@ -25,3 +25,4 @@ begin
     on conflict (season_id, level) do nothing;
   end loop;
 end $$;
+

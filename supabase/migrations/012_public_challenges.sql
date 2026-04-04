@@ -1,7 +1,7 @@
 -- Public challenges: open calls where a team looks for an opponent
 
 create table public.public_challenges (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   team_id uuid not null references public.teams(id) on delete cascade,
   mode text not null check (mode in ('5x5', '8x8')),
   scheduled_at timestamptz,
@@ -40,4 +40,6 @@ create index idx_public_challenges_status
 
 create index idx_public_challenges_team
   on public.public_challenges(team_id);
+
+
 

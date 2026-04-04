@@ -3,3 +3,4 @@
 
 alter table public.profiles
   add column if not exists warface_nick text;
+

@@ -8,3 +8,4 @@ create table if not exists public.tournament_registrations (
   unique (tournament_id, team_id)
 );
 
+

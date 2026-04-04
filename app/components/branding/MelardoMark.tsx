@@ -1,60 +1,50 @@
-"use client";
-
-import { useId } from "react";
+// app/components/branding/MelardoMark.tsx
+import * as React from "react";
 
 type MelardoMarkProps = {
   className?: string;
-  title?: string;
 };
 
-/**
- * Монограмма M как на референсе: острый «рог» слева сверху, глубокая впадина, красное свечение снизу.
- */
-export function MelardoMark({ className, title = "MELARDO" }: MelardoMarkProps) {
-  const uid = useId().replace(/:/g, "");
-  const metal = `mm-metal-${uid}`;
-  const red = `mm-red-${uid}`;
-  const glow = `mm-glow-${uid}`;
-
+export function MelardoMark({ className }: MelardoMarkProps) {
   return (
     <svg
-      viewBox="0 0 48 52"
-      role="img"
-      aria-label={title}
-      className={className}
+      viewBox="0 0 96 96"
       xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="xMidYMid meet"
+      fill="none"
+      aria-label="Melardo mark"
+      className={className}
     >
-      <title>{title}</title>
       <defs>
-        <linearGradient id={metal} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="40%" stopColor="#E4E6EB" />
-          <stop offset="100%" stopColor="#9CA3AF" />
+        <linearGradient id="melardo-mark-white" x1="18" y1="18" x2="78" y2="58" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="0.45" stopColor="#F5F7FB" />
+          <stop offset="1" stopColor="#C9D0DD" />
         </linearGradient>
-        <linearGradient id={red} x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#FF6B35" />
-          <stop offset="55%" stopColor="#FF3B1F" />
-          <stop offset="100%" stopColor="#C41E12" />
+
+        <linearGradient id="melardo-mark-red" x1="18" y1="58" x2="48" y2="86" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FF3B30" />
+          <stop offset="0.55" stopColor="#FF4D2E" />
+          <stop offset="1" stopColor="#FF1E1E" />
         </linearGradient>
-        <filter id={glow} x="-40%" y="-30%" width="180%" height="200%">
-          <feGaussianBlur stdDeviation="1.8" result="b" />
+
+        <filter id="melardo-mark-red-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3.5" result="blur" />
           <feMerge>
-            <feMergeNode in="b" />
+            <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
       </defs>
 
       <path
-        fill={`url(#${metal})`}
-        d="M6 42 L6 14 L3 10 L10 4 L16 8 L24 22 L32 8 L38 4 L45 10 L42 14 L42 42 L32 42 L32 20 L24 32 L16 20 L16 42 Z"
+        d="M18 20L35.2 35.8L48 25.2L60.8 35.8L78 20V56H66V42.6L48 57.4L30 42.6V56H18V20Z"
+        fill="url(#melardo-mark-white)"
       />
 
-      <g filter={`url(#${glow})`}>
+      <g filter="url(#melardo-mark-red-glow)">
         <path
-          fill={`url(#${red})`}
-          d="M8 40 L24 50 L40 40 L24 46 Z"
+          d="M18 56.5L48 82L78 56.5L48 69.8L18 56.5Z"
+          fill="url(#melardo-mark-red)"
         />
       </g>
     </svg>

@@ -131,3 +131,4 @@ create table if not exists public.player_maps_played (
 create index if not exists idx_player_maps_user_period on public.player_maps_played(user_id, period_key, mission_type);
 
 alter table public.player_maps_played enable row level security;
+

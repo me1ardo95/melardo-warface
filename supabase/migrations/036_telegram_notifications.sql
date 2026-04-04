@@ -96,3 +96,4 @@ create trigger on_smurf_flag_created
   for each row
   execute procedure public.on_smurf_flag_created();
 
+

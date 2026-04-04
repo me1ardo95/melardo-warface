@@ -8,3 +8,4 @@ alter table public.rewards_log
   add constraint rewards_log_source_type_check
   check (source_type in ('mission', 'season_level', 'tournament'));
 
+

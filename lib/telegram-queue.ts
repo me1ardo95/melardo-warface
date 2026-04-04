@@ -4,6 +4,7 @@ export type TelegramNotificationType =
   | "match_created"
   | "match_accepted"
   | "match_started"
+  | "match_result_confirmation_required"
   | "match_result_submitted"
   | "match_confirmed"
   | "match_finished"

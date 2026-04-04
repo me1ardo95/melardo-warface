@@ -5,6 +5,21 @@ import Link from "next/link";
 import { login } from "@/app/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 
+const STABLE_PRODUCTION_URL = "https://melardo-warface-2026.vercel.app";
+
+function getPasswordResetRedirectUrl() {
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!configuredSiteUrl) return `${STABLE_PRODUCTION_URL}/reset-password`;
+
+  const normalizedConfiguredUrl = configuredSiteUrl.replace(/\/+$/, "");
+  const isVercelPreviewUrl =
+    normalizedConfiguredUrl.includes(".vercel.app") &&
+    normalizedConfiguredUrl !== STABLE_PRODUCTION_URL;
+
+  const baseUrl = isVercelPreviewUrl ? STABLE_PRODUCTION_URL : normalizedConfiguredUrl;
+  return `${baseUrl}/reset-password`;
+}
+
 export default function LoginPage() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -148,7 +163,9 @@ export default function LoginPage() {
                       try {
                         const supabase = createClient();
                         const { error } =
-                          await supabase.auth.resetPasswordForEmail(email);
+                          await supabase.auth.resetPasswordForEmail(email, {
+                            redirectTo: getPasswordResetRedirectUrl(),
+                          });
                         if (error) throw error;
                         setResetSuccess(true);
                       } catch (e) {

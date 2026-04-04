@@ -25,6 +25,15 @@ function isAuthorized(request: Request): boolean {
 
 function buildMessage(type: string, payload: Record<string, any>): string | null {
   switch (type) {
+    case "match_result_confirmation_required":
+      return [
+        "<b>Нужно подтвердить результат матча</b>",
+        payload.match_id ? `Матч: ${payload.match_id}` : null,
+        "",
+        "Перейдите на платформу и подтвердите итог матча.",
+      ]
+        .filter(Boolean)
+        .join("\n");
     case "match_created":
       return [
         "<b>Новый матч создан</b>",

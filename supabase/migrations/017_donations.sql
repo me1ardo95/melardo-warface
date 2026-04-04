@@ -1,7 +1,7 @@
 -- Донаты и поддержка проекта
 
 create table if not exists public.donations (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default extensions.uuid_generate_v4(),
   user_id uuid references public.profiles(id) on delete set null,
   team_id uuid references public.teams(id) on delete set null,
   amount int not null check (amount >= 0),
@@ -30,4 +30,5 @@ create index if not exists idx_donations_user
 create index if not exists idx_donations_team
   on public.donations(team_id)
   where team_id is not null;
+
 
